@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>もぐもぐタイム！</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F7F7F5;display:flex;justify-content:center;padding:1.5rem 1rem 3rem;min-height:100vh;}
+#app{width:100%;max-width:520px;display:flex;flex-direction:column;gap:1rem;align-items:center;}
+h1{font-size:20px;font-weight:600;color:#1a1a18;letter-spacing:.5px;}
+.top-bar{width:100%;display:flex;justify-content:space-between;}
+.badge{border-radius:20px;padding:5px 16px;font-size:13px;font-weight:500;}
+.bg{background:#E1F5EE;border:1px solid #5DCAA5;color:#085041;}
+.ba{background:#FAEEDA;border:1px solid #EF9F27;color:#412402;}
+.cam-area{position:fixed;top:14px;right:14px;width:90px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid #D0CEC8;background:#111;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+.cam-overlay{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:10px;color:#fff;background:rgba(0,0,0,.55);padding:1px 7px;border-radius:8px;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.dot{width:6px;height:6px;border-radius:50%;background:#ccc;flex-shrink:0;}
+.dot.on{background:#1D9E75;}
+.notice{font-size:12px;color:#666;text-align:center;max-width:340px;line-height:1.6;}
+
+/* キャラクター選択 */
+.char-select{display:flex;gap:20px;}
+.char-card{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:10px 18px;border-radius:16px;border:2.5px solid #D0CEC8;background:#fff;transition:all .18s;user-select:none;}
+.char-card:hover{border-color:#aaa;}
+.char-card.active.boy{border-color:#5BA4D4;background:#EAF4FC;}
+.char-card.active.girl{border-color:#E07BAC;background:#FDF0F6;}
+.char-card svg{width:72px;height:72px;}
+.char-card-label{font-size:13px;font-weight:500;color:#666;}
+.char-card.active.boy .char-card-label{color:#2C6EA0;font-weight:700;}
+.char-card.active.girl .char-card-label{color:#C0467E;font-weight:700;}
+
+.char-row{display:flex;align-items:flex-end;gap:1.2rem;}
+svg.char{width:120px;height:120px;}
+.bubble{background:#fff;border:1.5px solid #D0CEC8;border-radius:12px;padding:9px 14px;font-size:13px;color:#1a1a18;max-width:190px;min-height:38px;display:flex;align-items:center;line-height:1.5;}
+.chew-meter{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chew-label{font-size:11px;color:#888;}
+.chew-wrap{width:16px;height:80px;background:#EDECEA;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border:.5px solid #D0CEC8;}
+.chew-fill{width:100%;background:#1D9E75;border-radius:8px;transition:height .15s;}
+.chew-num{font-size:16px;font-weight:600;color:#1a1a18;}
+
+.age-tabs{display:flex;gap:8px;}
+.tab{padding:7px 18px;border-radius:20px;border:1.5px solid #D0CEC8;background:#fff;color:#666;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.tab.active{background:#1D9E75;color:#fff;border-color:#1D9E75;}
+.timer-num{font-size:52px;font-weight:500;color:#1a1a18;letter-spacing:2px;font-variant-numeric:tabular-nums;}
+.bar-wrap{width:100%;max-width:380px;height:20px;background:#EDECEA;border-radius:10px;overflow:hidden;border:.5px solid #D0CEC8;}
+.bar-fill{height:100%;border-radius:10px;background:#1D9E75;transition:width .6s linear;}
+.missions{width:100%;max-width:380px;display:flex;flex-direction:column;gap:6px;}
+.mission{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:.5px solid #D0CEC8;background:#fff;}
+.mission.done{opacity:.55;background:#F7F7F5;}
+.mi{font-size:18px;width:26px;text-align:center;}
+.mt{flex:1;font-size:13px;color:#1a1a18;}
+.mp{font-size:12px;font-weight:500;color:#0F6E56;background:#E1F5EE;border-radius:10px;padding:2px 10px;}
+.mission.done .mp{color:#888;background:#EDECEA;}
+.stamp-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:36px;max-width:340px;}
+.stamp{width:36px;height:36px;border-radius:50%;background:#E1F5EE;border:1.5px solid #5DCAA5;display:flex;align-items:center;justify-content:center;font-size:18px;animation:pop .35s;}
+@keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.3);}100%{transform:scale(1);}}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.btn{padding:10px 24px;border-radius:10px;border:1.5px solid #D0CEC8;background:#fff;color:#1a1a18;font-size:14px;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn:hover{background:#F0EEEC;}
+.btn.primary{background:#1D9E75;color:#fff;border-color:#1D9E75;}
+.btn.primary:hover{background:#0F6E56;}
+.btn:disabled{opacity:.5;cursor:default;}
+.result{padding:16px 22px;border-radius:12px;border:1.5px solid #5DCAA5;background:#E1F5EE;text-align:center;font-size:15px;font-weight:500;color:#085041;display:none;width:100%;max-width:380px;line-height:1.8;}
+.bounce{animation:bnc .45s ease;}
+@keyframes bnc{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>🍽 もぐもぐタイム！</h1>
+
+  <div class="top-bar">
+    <div class="badge bg" id="lvBadge">レベル 1</div>
+    <div class="badge ba" id="ptBadge">⭐ 0 pt</div>
+  </div>
+
+  <div class="cam-area">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="cam-overlay"><div class="dot" id="dot"></div><span id="camTxt">準備中</span></div>
+  </div>
+  <p class="notice" id="notice">「カメラ起動」を押して、顔をカメラに向けてね！</p>
+
+  <!-- ① キャラクター選択カード -->
+  <div class="char-select">
+    <!-- 男の子カード -->
+    <div class="char-card boy" id="cardBoy" onclick="selectChar('boy')">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="64" rx="22" ry="14" fill="#5BA4D4"/>
+        <circle cx="40" cy="36" r="24" fill="#FAC775"/>
+        <path d="M16 32 Q16 10 40 10 Q64 10 64 32" fill="#5C3A1E"/>
+        <rect x="15" y="26" width="6" height="12" rx="3" fill="#5C3A1E"/>
+        <rect x="59" y="26" width="6" height="12" rx="3" fill="#5C3A1E"/>
+        <circle cx="16" cy="36" r="6" fill="#EF9F27"/>
+        <circle cx="64" cy="36" r="6" fill="#EF9F27"/>
+        <ellipse cx="30" cy="33" rx="4" ry="4.5" fill="#2C2C2A"/>
+        <ellipse cx="50" cy="33" rx="4" ry="4.5" fill="#2C2C2A"/>
+        <circle cx="31.5" cy="30.5" r="1.5" fill="white"/>
+        <circle cx="51.5" cy="30.5" r="1.5" fill="white"/>
+        <ellipse cx="26" cy="41" rx="5" ry="3" fill="#F4B878" opacity=".5"/>
+        <ellipse cx="54" cy="41" rx="5" ry="3" fill="#F4B878" opacity=".5"/>
+        <path d="M32 47 Q40 53 48 47" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="char-card-label">👦 男の子</div>
+    </div>
+
+    <!-- 女の子カード -->
+    <div class="char-card girl" id="cardGirl" onclick="selectChar('girl')">
+      <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="64" rx="22" ry="14" fill="#E07BAC"/>
+        <!-- 後ろ髪 -->
+        <path d="M16 30 Q12 62 18 76 Q28 82 40 82 Q52 82 62 76 Q68 62 64 30 Q62 10 40 10 Q18 10 16 30Z" fill="#3D1F0A"/>
+        <circle cx="40" cy="36" r="24" fill="#FAC775"/>
+        <!-- 前髪 -->
+        <path d="M16 34 Q16 10 40 10 Q64 10 64 34" fill="#3D1F0A"/>
+        <!-- リボン -->
+        <ellipse cx="30" cy="12" rx="9" ry="5" fill="#E07BAC"/>
+        <ellipse cx="50" cy="12" rx="9" ry="5" fill="#E07BAC"/>
+        <circle cx="40" cy="12" r="5" fill="#C0467E"/>
+        <circle cx="40" cy="12" r="2.5" fill="#F4A0C0"/>
+        <circle cx="16" cy="36" r="6" fill="#EF9F27"/>
+        <circle cx="64" cy="36" r="6" fill="#EF9F27"/>
+        <ellipse cx="30" cy="33" rx="4" ry="4.5" fill="#2C2C2A"/>
+        <ellipse cx="50" cy="33" rx="4" ry="4.5" fill="#2C2C2A"/>
+        <circle cx="31.5" cy="30.5" r="1.5" fill="white"/>
+        <circle cx="51.5" cy="30.5" r="1.5" fill="white"/>
+        <!-- まつ毛 -->
+        <line x1="27" y1="30" x2="25" y2="27" stroke="#2C2C2A" stroke-width="1.2"/>
+        <line x1="30" y1="28.5" x2="30" y2="26" stroke="#2C2C2A" stroke-width="1.2"/>
+        <line x1="33" y1="30" x2="35" y2="27" stroke="#2C2C2A" stroke-width="1.2"/>
+        <line x1="47" y1="30" x2="45" y2="27" stroke="#2C2C2A" stroke-width="1.2"/>
+        <line x1="50" y1="28.5" x2="50" y2="26" stroke="#2C2C2A" stroke-width="1.2"/>
+        <line x1="53" y1="30" x2="55" y2="27" stroke="#2C2C2A" stroke-width="1.2"/>
+        <!-- ほっぺ -->
+        <ellipse cx="24" cy="41" rx="5" ry="3" fill="#F4A0C0" opacity=".6"/>
+        <ellipse cx="56" cy="41" rx="5" ry="3" fill="#F4A0C0" opacity=".6"/>
+        <path d="M32 47 Q40 53 48 47" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="char-card-label">👧 女の子</div>
+    </div>
+  </div>
+
+  <!-- ② メインキャラクター（大・口が連動） -->
+  <div class="char-row">
+    <div class="chew-meter">
+      <div class="chew-label">もぐもぐ</div>
+      <div class="chew-wrap"><div class="chew-fill" id="chewFill" style="height:0%"></div></div>
+      <div class="chew-num" id="chewNum">0</div>
+    </div>
+
+    <svg class="char" id="charSvg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- 後ろ髪（女の子用） -->
+      <path id="hairBack" d="" fill="#3D1F0A"/>
+      <!-- 体 -->
+      <ellipse id="charBody" cx="60" cy="102" rx="34" ry="16" fill="#5BA4D4"/>
+      <!-- 腕 -->
+      <ellipse cx="30" cy="104" rx="12" ry="7" fill="#FAC775" transform="rotate(-22,30,104)"/>
+      <ellipse cx="90" cy="104" rx="12" ry="7" fill="#FAC775" transform="rotate(22,90,104)"/>
+      <!-- 頭 -->
+      <circle cx="60" cy="54" r="34" fill="#FAC775"/>
+      <!-- 耳 -->
+      <circle cx="26" cy="54" r="10" fill="#EF9F27"/>
+      <circle cx="94" cy="54" r="10" fill="#EF9F27"/>
+      <!-- 男の子の前髪 -->
+      <path id="hairBoyFront" d="M26 46 Q26 18 60 18 Q94 18 94 46" fill="#5C3A1E"/>
+      <rect id="hairBoyL" x="24" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
+      <rect id="hairBoyR" x="89" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
+      <!-- 女の子の前髪 -->
+      <path id="hairGirlFront" d="" fill="#3D1F0A"/>
+      <!-- リボン（女の子用） -->
+      <g id="ribbon" opacity="0">
+        <ellipse cx="42" cy="20" rx="12" ry="6.5" fill="#E07BAC"/>
+        <ellipse cx="78" cy="20" rx="12" ry="6.5" fill="#E07BAC"/>
+        <circle cx="60" cy="20" r="6.5" fill="#C0467E"/>
+        <circle cx="60" cy="20" r="3" fill="#F4A0C0"/>
+      </g>
+      <!-- まつ毛（女の子用） -->
+      <g id="lashes" opacity="0">
+        <line x1="42" y1="44" x2="38" y2="40" stroke="#2C2C2A" stroke-width="1.8"/>
+        <line x1="47" y1="42" x2="47" y2="38" stroke="#2C2C2A" stroke-width="1.8"/>
+        <line x1="52" y1="44" x2="56" y2="40" stroke="#2C2C2A" stroke-width="1.8"/>
+        <line x1="68" y1="44" x2="64" y2="40" stroke="#2C2C2A" stroke-width="1.8"/>
+        <line x1="73" y1="42" x2="73" y2="38" stroke="#2C2C2A" stroke-width="1.8"/>
+        <line x1="78" y1="44" x2="82" y2="40" stroke="#2C2C2A" stroke-width="1.8"/>
+      </g>
+      <!-- ほっぺ（女の子用） -->
+      <ellipse id="cheekL" cx="32" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
+      <ellipse id="cheekR" cx="88" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
+      <!-- 目 -->
+      <ellipse id="eL" cx="46" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
+      <ellipse id="eR" cx="74" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
+      <circle cx="48" cy="47" r="2" fill="white"/>
+      <circle cx="76" cy="47" r="2" fill="white"/>
+      <!-- 上唇（固定） -->
+      <path d="M50 64 Q60 64 70 64" stroke="#2C2C2A" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- 顎（口の開閉で動く） -->
+      <ellipse id="jaw" cx="60" cy="68" rx="10" ry="3" fill="#FAC775"/>
+      <!-- 下唇（口の開閉で動く） -->
+      <path id="lowerlip" d="M50 68 Q60 74 70 68" stroke="#2C2C2A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- スプーン -->
+      <rect x="88" y="84" width="4" height="24" rx="2" fill="#888780"/>
+      <ellipse cx="90" cy="82" rx="6" ry="5" fill="#B4B2A9"/>
+    </svg>
+
+    <div class="bubble" id="bubble">キャラクターをえらんでね！</div>
+  </div>
+
+  <div class="age-tabs">
+    <button class="tab" onclick="setAge(1)">1〜2歳</button>
+    <button class="tab" onclick="setAge(3)">3〜4歳</button>
+    <button class="tab" onclick="setAge(5)">5〜6歳</button>
+  </div>
+
+  <div class="timer-num" id="timerEl">--:--</div>
+  <div class="bar-wrap"><div class="bar-fill" id="barFill" style="width:100%"></div></div>
+  <div class="missions" id="missionList"></div>
+
+  <div class="controls">
+    <button class="btn" id="camBtn" onclick="startCam()">📷 カメラ起動</button>
+    <button class="btn primary" id="startBtn" onclick="startTimer()" disabled>スタート！</button>
+    <button class="btn" onclick="resetAll()">リセット</button>
+  </div>
+
+  <div class="stamp-grid" id="stampGrid"></div>
+  <div class="result" id="result"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script>
+const CFGS={
+  1:{mins:3,missions:[
+    {id:'c20',icon:'🍚',text:'20回もぐもぐした！',pts:10,done:false},
+    {id:'half',icon:'⏰',text:'半分まで食べた！',pts:8,done:false},
+    {id:'fin',icon:'🎉',text:'ぜんぶたべた！',pts:20,done:false},
+  ]},
+  3:{mins:8,missions:[
+    {id:'c30',icon:'🍚',text:'30回もぐもぐした！',pts:10,done:false},
+    {id:'half',icon:'⏰',text:'半分まで食べた！',pts:8,done:false},
+    {id:'c60',icon:'💪',text:'60回もぐもぐ達成！',pts:15,done:false},
+    {id:'fin',icon:'🎉',text:'ぜんぶたべた！',pts:25,done:false},
+  ]},
+  5:{mins:15,missions:[
+    {id:'c50',icon:'🍚',text:'50回もぐもぐした！',pts:10,done:false},
+    {id:'half',icon:'⏰',text:'半分まで食べた！',pts:8,done:false},
+    {id:'c100',icon:'💪',text:'100回もぐもぐ達成！',pts:20,done:false},
+    {id:'fin',icon:'🎉',text:'ぜんぶたべた！',pts:30,done:false},
+  ]},
+};
+const STAMPS=['🍙','🥕','🐟','🍠','🥦','🍳','🍜','🍱','🍎','🥚'];
+const MSGS=['もぐもぐ！えらい！','おいしいかな？','すごい！どんどん食べてる！','もう少しだよ！','もぐもぐ名人！'];
+
+let age=null,cfg=null,totalSec=0,remaining=0,timerInt=null;
+let points=0,stampArr=[],chewCount=0,mouthOpen=false,halfDone=false;
+let camReady=false, currentChar=null;
+
+const $=id=>document.getElementById(id);
+const video=$('video'),dot=$('dot'),camTxt=$('camTxt'),notice=$('notice');
+const bubble=$('bubble'),charSvg=$('charSvg'),startBtn=$('startBtn');
+const timerEl=$('timerEl'),barFill=$('barFill'),missionList=$('missionList');
+const stampGrid=$('stampGrid'),resultEl=$('result');
+const jaw=$('jaw'),lowerlip=$('lowerlip'),chewFill=$('chewFill'),chewNum=$('chewNum');
+const eL=$('eL'),eR=$('eR');
+
+// ====== キャラクター選択 ======
+function selectChar(type){
+  currentChar = type;
+  const isBoy = type === 'boy';
+
+  // カードのactive切替
+  $('cardBoy').className = 'char-card boy' + (isBoy ? ' active' : '');
+  $('cardGirl').className = 'char-card girl' + (!isBoy ? ' active' : '');
+
+  // 体の色
+  $('charBody').setAttribute('fill', isBoy ? '#5BA4D4' : '#E07BAC');
+
+  // 男の子の前髪
+  const boyAlpha = isBoy ? '1' : '0';
+  $('hairBoyFront').setAttribute('opacity', boyAlpha);
+  $('hairBoyL').setAttribute('opacity', boyAlpha);
+  $('hairBoyR').setAttribute('opacity', boyAlpha);
+
+  // 女の子の後ろ髪・前髪
+  if(!isBoy){
+    $('hairBack').setAttribute('d',
+      'M26 24 Q20 62 26 88 Q38 96 60 96 Q82 96 94 88 Q100 62 94 24 Q90 14 60 14 Q30 14 26 24Z');
+    $('hairGirlFront').setAttribute('d', 'M26 48 Q26 16 60 16 Q94 16 94 48');
+    $('hairGirlFront').setAttribute('opacity', '1');
+    $('hairBack').setAttribute('opacity', '1');
+  } else {
+    $('hairBack').setAttribute('d', '');
+    $('hairBack').setAttribute('opacity', '0');
+    $('hairGirlFront').setAttribute('d', '');
+    $('hairGirlFront').setAttribute('opacity', '0');
+  }
+
+  // 女の子専用パーツ
+  const girlAlpha = isBoy ? '0' : '1';
+  $('ribbon').setAttribute('opacity', girlAlpha);
+  $('lashes').setAttribute('opacity', girlAlpha);
+  $('cheekL').setAttribute('opacity', isBoy ? '0' : '0.55');
+  $('cheekR').setAttribute('opacity', isBoy ? '0' : '0.55');
+
+  bubble.textContent = isBoy ? '男の子だね！なんさい？' : '女の子だね！なんさい？';
+  if(camReady && age) startBtn.disabled = false;
+}
+
+// ====== 口の開閉（リアルタイム連動） ======
+function setMouth(ratio){
+  const baseY=68, openY=80;
+  const y = baseY + (openY - baseY) * ratio;
+  const ry = 3 + 6 * ratio;
+  jaw.setAttribute('cy', y.toFixed(1));
+  jaw.setAttribute('ry', ry.toFixed(1));
+  lowerlip.setAttribute('d', `M50 ${baseY} Q60 ${(y + 5*ratio).toFixed(1)} 70 ${baseY}`);
+}
+
+// ====== 顔検出 ======
+function onResults(res){
+  if(!res.multiFaceLandmarks?.length){
+    dot.className='dot'; camTxt.textContent='顔が見えないよ';
+    setMouth(0); mouthOpen=false; return;
+  }
+  dot.className='dot on'; camTxt.textContent='検出中';
+  const lm = res.multiFaceLandmarks[0];
+  const rawDist = lm[14].y - lm[13].y;
+  const faceH = Math.abs(lm[152].y - lm[1].y) || 0.3;
+  const normDist = rawDist / faceH;
+  const ratio = Math.min(1, Math.max(0, (normDist - 0.05) / 0.13));
+  setMouth(ratio);
+
+  const isOpen = normDist > 0.10;
+  if(isOpen && !mouthOpen && timerInt){
+    mouthOpen=true; chewCount++;
+    chewNum.textContent = chewCount;
+    chewFill.style.height = Math.min(100, chewCount) + '%';
+    checkChew(); bounce();
+    if(chewCount % 10 === 0) setBubble();
+  }
+  if(!isOpen) mouthOpen=false;
+}
+
+// ====== カメラ起動 ======
+async function startCam(){
+  $('camBtn').disabled=true; camTxt.textContent='起動中...';
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+    video.srcObject = stream;
+    const fm = new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+    fm.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.6,minTrackingConfidence:0.6});
+    fm.onResults(onResults);
+    new Camera(video,{onFrame:async()=>fm.send({image:video}),width:320,height:240}).start();
+    camReady=true; dot.className='dot on'; camTxt.textContent='準備完了';
+    notice.textContent='顔をカメラに向けてね！年齢を選んでスタート！';
+    if(currentChar) bubble.textContent='みえたよ！なんさい？';
+    if(age && currentChar) startBtn.disabled=false;
+  }catch(e){
+    camTxt.textContent='エラー';
+    notice.textContent='カメラの許可が必要です。ブラウザのアドレスバー左のアイコンから許可してください。';
+    $('camBtn').disabled=false;
+  }
+}
+
+// ====== 年齢設定 ======
+function setAge(a){
+  age=a; cfg=JSON.parse(JSON.stringify(CFGS[a]));
+  totalSec=cfg.mins*60; remaining=totalSec;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',[1,3,5][i]===a));
+  renderMissions(); updateDisplay();
+  if(camReady && currentChar) startBtn.disabled=false;
+  bubble.textContent=['1〜2歳','3〜4歳','5〜6歳'][[1,3,5].indexOf(a)]+'モードだね！スタートしよう！';
+  resultEl.style.display='none';
+}
+
+function renderMissions(){
+  missionList.innerHTML='';
+  cfg?.missions.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='mission'+(m.done?' done':'');
+    d.id='m-'+m.id;
+    d.innerHTML=`<div class="mi">${m.done?'✅':m.icon}</div><div class="mt">${m.text}</div><div class="mp">${m.done?'クリア!':'+'+m.pts+'pt'}</div>`;
+    missionList.appendChild(d);
+  });
+}
+
+function complete(id){
+  const m=cfg?.missions.find(x=>x.id===id);
+  if(!m||m.done)return;
+  m.done=true; addPts(m.pts); addStamp(); setBubble(); bounce(); renderMissions();
+}
+
+function checkChew(){
+  const ids={c20:20,c30:30,c50:50,c60:60,c100:100};
+  Object.entries(ids).forEach(([id,n])=>{if(chewCount>=n)complete(id);});
+}
+
+function addPts(p){
+  points+=p; $('ptBadge').textContent='⭐ '+points+' pt';
+  $('lvBadge').textContent='レベル '+(points<30?1:points<70?2:points<120?3:4);
+}
+
+function addStamp(){
+  const s=document.createElement('div');
+  s.className='stamp'; s.textContent=STAMPS[stampArr.length%STAMPS.length];
+  stampGrid.appendChild(s); stampArr.push(s);
+}
+
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function updateDisplay(){
+  timerEl.textContent=remaining>=0?fmt(remaining):'00:00';
+  barFill.style.width=Math.round(totalSec>0?(remaining/totalSec)*100:0)+'%';
+}
+function setBubble(){bubble.textContent=MSGS[Math.floor(Math.random()*MSGS.length)];}
+function bounce(){
+  charSvg.classList.remove('bounce');
+  void charSvg.offsetWidth;
+  charSvg.classList.add('bounce');
+  setTimeout(()=>charSvg.classList.remove('bounce'),450);
+}
+
+function startTimer(){
+  if(timerInt)return;
+  startBtn.disabled=true; halfDone=false;
+  chewCount=0; chewNum.textContent='0'; chewFill.style.height='0%';
+  bubble.textContent='もぐもぐスタート！'; resultEl.style.display='none';
+  timerInt=setInterval(()=>{
+    remaining--; updateDisplay();
+    if(!halfDone&&remaining<=totalSec/2){halfDone=true;complete('half');}
+    if(Math.random()<0.05){
+      eL.setAttribute('ry','1');eR.setAttribute('ry','1');
+      setTimeout(()=>{eL.setAttribute('ry','6');eR.setAttribute('ry','6');},150);
+    }
+    if(remaining<=0){clearInterval(timerInt);timerInt=null;finish();}
+  },1000);
+}
+
+function finish(){
+  complete('fin'); startBtn.disabled=false;
+  bubble.textContent='やったー！ごはんかんりょう！'; bounce();
+  const lv=points<30?1:points<70?2:points<120?3:4;
+  resultEl.style.display='block';
+  resultEl.innerHTML=`🎉 ごはんかんりょう！<br>⭐ ${points}pt　レベル${lv}　もぐもぐ${chewCount}回　スタンプ×${stampArr.length}`;
+}
+
+function resetAll(){
+  clearInterval(timerInt); timerInt=null;
+  points=0; stampArr=[]; age=null; cfg=null;
+  chewCount=0; halfDone=false; mouthOpen=false;
+  timerEl.textContent='--:--'; barFill.style.width='100%';
+  bubble.textContent='キャラクターをえらんでね！';
+  startBtn.disabled=true; missionList.innerHTML='';
+  stampGrid.innerHTML=''; resultEl.style.display='none';
+  chewFill.style.height='0%'; chewNum.textContent='0';
+  $('ptBadge').textContent='⭐ 0 pt'; $('lvBadge').textContent='レベル 1';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  setMouth(0);
+}
+</script>
+</body>
+</html>
