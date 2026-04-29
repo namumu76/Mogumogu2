@@ -306,7 +306,7 @@ function selectChar(type){
   if(camReady && age) startBtn.disabled = false;
 }
 
-// ====== 口の開閉（リアルタイム連動） ======
+// ====== 口の動き（リアルタイム連動） ======
 function setMouth(ratio){
   const baseY=68, openY=80;
   const y = baseY + (openY - baseY) * ratio;
@@ -316,29 +316,71 @@ function setMouth(ratio){
   lowerlip.setAttribute('d', `M50 ${baseY} Q60 ${(y + 5*ratio).toFixed(1)} 70 ${baseY}`);
 }
 
-// ====== 顔検出 ======
+// ====== 咀嚼検知：顎の上下ピーク検出 ======
+// 口の開閉だけでなく、顎（lm[152]）と頬（lm[234]〜lm[454]）の
+// 相対距離の変化量を見てピークを検出する。
+// これにより口を閉じたままの咀嚼も認識できる。
+let jawHistory = [];        // 直近の顎距離の履歴
+let jawBaseline = null;     // 安静時のベースライン
+let inChewMotion = false;   // 動きの山の中にいるか
+const JAW_HISTORY = 6;      // 履歴フレーム数
+const CHEW_THRESH = 0.012;  // 変化量の閾値（顔高さ比）
+
 function onResults(res){
   if(!res.multiFaceLandmarks?.length){
     dot.className='dot'; camTxt.textContent='顔が見えないよ';
-    setMouth(0); mouthOpen=false; return;
+    setMouth(0); jawHistory=[]; inChewMotion=false; return;
   }
   dot.className='dot on'; camTxt.textContent='検出中';
   const lm = res.multiFaceLandmarks[0];
-  const rawDist = lm[14].y - lm[13].y;
-  const faceH = Math.abs(lm[152].y - lm[1].y) || 0.3;
-  const normDist = rawDist / faceH;
-  const ratio = Math.min(1, Math.max(0, (normDist - 0.05) / 0.13));
-  setMouth(ratio);
 
-  const isOpen = normDist > 0.10;
-  if(isOpen && !mouthOpen && timerInt){
-    mouthOpen=true; chewCount++;
-    chewNum.textContent = chewCount;
-    chewFill.style.height = Math.min(100, chewCount) + '%';
-    checkChew(); bounce();
-    if(chewCount % 10 === 0) setBubble();
+  // ① 顔の高さで正規化（鼻先1 〜 顎先152）
+  const faceH = Math.abs(lm[152].y - lm[1].y) || 0.3;
+
+  // ② 口の開き具合（上唇13・下唇14）→ キャラクターの口に反映
+  const lipDist = (lm[14].y - lm[13].y) / faceH;
+  const lipRatio = Math.min(1, Math.max(0, (lipDist - 0.04) / 0.14));
+  setMouth(lipRatio);
+
+  // ③ 顎の動き：顎先(152)と鼻下(164)の距離で顎の下がり具合を計測
+  const jawDist = (lm[152].y - lm[164].y) / faceH;
+
+  // ベースライン（安静時）を最初の10フレームで確定
+  if(jawBaseline === null){
+    jawHistory.push(jawDist);
+    if(jawHistory.length >= 10){
+      jawBaseline = jawHistory.reduce((a,b)=>a+b,0) / jawHistory.length;
+      jawHistory = [];
+    }
+    return;
   }
-  if(!isOpen) mouthOpen=false;
+
+  // 直近フレームの履歴を保持
+  jawHistory.push(jawDist);
+  if(jawHistory.length > JAW_HISTORY) jawHistory.shift();
+  if(jawHistory.length < JAW_HISTORY) return;
+
+  // ④ 現在値とベースラインの差分（顎が下がる＝咀嚼の山）
+  const delta = jawDist - jawBaseline;
+
+  // ⑤ ピーク検出：閾値を超えたら「咀嚼中」フラグON、
+  //    下がったらカウント（1回の咀嚼 = 山の立ち上がり〜立ち下がり）
+  if(!inChewMotion && delta > CHEW_THRESH){
+    inChewMotion = true;
+  } else if(inChewMotion && delta < CHEW_THRESH * 0.4){
+    // 山を抜けた → 1もぐもぐカウント
+    inChewMotion = false;
+    if(timerInt){
+      chewCount++;
+      chewNum.textContent = chewCount;
+      chewFill.style.height = Math.min(100, chewCount) + '%';
+      checkChew(); bounce();
+      if(chewCount % 10 === 0) setBubble();
+    }
+  }
+
+  // ベースラインをゆっくり追従（ドリフト補正）
+  jawBaseline = jawBaseline * 0.98 + jawDist * 0.02;
 }
 
 // ====== カメラ起動 ======
@@ -447,6 +489,7 @@ function resetAll(){
   clearInterval(timerInt); timerInt=null;
   points=0; stampArr=[]; age=null; cfg=null;
   chewCount=0; halfDone=false; mouthOpen=false;
+  jawHistory=[]; jawBaseline=null; inChewMotion=false;
   timerEl.textContent='--:--'; barFill.style.width='100%';
   bubble.textContent='キャラクターをえらんでね！';
   startBtn.disabled=true; missionList.innerHTML='';
