@@ -190,9 +190,10 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
       <path id="c2hairBack" d="" fill="#3D1F0A"/>
       <!-- 体 -->
       <ellipse id="c2body" cx="60" cy="104" rx="34" ry="14" fill="#5BA4D4"/>
-      <!-- 腕 -->
-      <ellipse cx="30" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(-22,30,106)"/>
-      <ellipse cx="90" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(22,90,106)"/>
+      <!-- 左腕（動く） -->
+      <line id="c2armL" x1="30" y1="92" x2="14" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
+      <!-- 右腕（動く） -->
+      <line id="c2armR" x1="90" y1="92" x2="106" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
       <!-- 頭 -->
       <circle cx="60" cy="54" r="34" fill="#FAC775"/>
       <!-- 耳 -->
@@ -269,8 +270,10 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
     <svg id="charSvg3" width="140" height="140" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="char-main">
       <path id="c3hairBack" d="" fill="#3D1F0A"/>
       <ellipse id="c3body" cx="60" cy="104" rx="34" ry="14" fill="#5BA4D4"/>
-      <ellipse cx="30" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(-22,30,106)"/>
-      <ellipse cx="90" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(22,90,106)"/>
+      <!-- 左腕（動く） -->
+      <line id="c3armL" x1="30" y1="92" x2="14" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
+      <!-- 右腕（動く） -->
+      <line id="c3armR" x1="90" y1="92" x2="106" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
       <circle cx="60" cy="54" r="34" fill="#FAC775"/>
       <circle cx="26" cy="54" r="10" fill="#EF9F27"/>
       <circle cx="94" cy="54" r="10" fill="#EF9F27"/>
@@ -328,6 +331,7 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
 
 <!-- MediaPipe -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 <script>
@@ -513,7 +517,7 @@ async function startCamera(){
     video.srcObject = stream;
     await new Promise(res => { video.onloadedmetadata = res; });
 
-    // FaceMesh 初期化
+    // FaceMesh 初期化（口・咀嚼検知）
     const fm = new FaceMesh({ locateFile: f =>
       `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
     });
@@ -525,20 +529,90 @@ async function startCamera(){
     });
     fm.onResults(onFaceResults);
 
+    // Pose 初期化（腕・手の検知）
+    const pose = new Pose({ locateFile: f =>
+      `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`
+    });
+    pose.setOptions({
+      modelComplexity: 0,          // 軽量モデル（スマホ向け）
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+    pose.onResults(onPoseResults);
+
+    // カメラループ：FaceMesh毎フレーム、Poseは2フレームおきで負荷分散
+    let frameCount = 0;
     mpCamera = new Camera(video, {
-      onFrame: async () => { await fm.send({ image: video }); },
+      onFrame: async () => {
+        frameCount++;
+        await fm.send({ image: video });
+        if(frameCount % 2 === 0) await pose.send({ image: video });
+      },
       width: 320, height: 240
     });
     mpCamera.start();
 
     sdot.className = 'sdot on';
-    stext.textContent = '顔が映ったら口を動かしてみてね！';
+    stext.textContent = '顔が映ったら口を動かしてみてね！手も動かせるよ🙌';
     mpReady = true;
 
   } catch(e) {
     sdot.className = 'sdot';
     stext.textContent = 'カメラの許可が必要です。ブラウザの設定を確認してください。';
     $('calNotice').textContent = '';
+  }
+}
+
+// ============================================================
+//  腕を動かす（肩→手先のline座標を更新）
+// ============================================================
+const ARM_DOWN = { L:{x:14,y:108}, R:{x:106,y:108} };
+const ARM_UP   = { L:{x:10,y:48},  R:{x:110,y:48}  };
+
+function applyArms(rL, rR){
+  ['c2','c3'].forEach(p=>{
+    const aL=$(p+'armL'), aR=$(p+'armR');
+    if(!aL||!aR) return;
+    // 左腕（カメラはミラーなので左右反転）
+    const lx = ARM_DOWN.L.x + (ARM_UP.L.x - ARM_DOWN.L.x)*rL;
+    const ly = ARM_DOWN.L.y + (ARM_UP.L.y - ARM_DOWN.L.y)*rL;
+    aL.setAttribute('x2', lx.toFixed(1));
+    aL.setAttribute('y2', ly.toFixed(1));
+    // 右腕
+    const rx = ARM_DOWN.R.x + (ARM_UP.R.x - ARM_DOWN.R.x)*rR;
+    const ry = ARM_DOWN.R.y + (ARM_UP.R.y - ARM_DOWN.R.y)*rR;
+    aR.setAttribute('x2', rx.toFixed(1));
+    aR.setAttribute('y2', ry.toFixed(1));
+  });
+}
+
+// ============================================================
+//  Pose コールバック（手の上げ下げ検出）
+// ============================================================
+let bothRaisedSaid = false;
+function onPoseResults(res){
+  if(!res.poseLandmarks){ applyArms(0,0); return; }
+  const lm = res.poseLandmarks;
+  // 11=左肩 12=右肩 15=左手首 16=右手首
+  const ls=lm[11], rs=lm[12], lw=lm[15], rw=lm[16];
+  if(!ls||!rs||!lw||!rw){ applyArms(0,0); return; }
+
+  const avgShoulderY = (ls.y + rs.y) / 2;
+  // 手首が肩より上にある割合（0〜1）。カメラY軸は下向きなので反転。
+  const rL = Math.min(1, Math.max(0, (avgShoulderY - lw.y + 0.04) / 0.22));
+  const rR = Math.min(1, Math.max(0, (avgShoulderY - rw.y + 0.04) / 0.22));
+
+  applyArms(rR, rL); // ミラー表示なので左右スワップ
+
+  // 両手を上げたら特別メッセージ
+  if(rL > 0.6 && rR > 0.6){
+    if(!bothRaisedSaid){
+      bothRaisedSaid = true;
+      randomSpeech(['やったー！🙌','すごい！両手！','えらい！']);
+    }
+  } else {
+    bothRaisedSaid = false;
   }
 }
 
@@ -619,8 +693,9 @@ function bounceChar(){
   });
 }
 
-function randomSpeech(){
-  const msg = SPEECH[Math.floor(Math.random() * SPEECH.length)];
+function randomSpeech(arr){
+  const pool = arr || SPEECH;
+  const msg = pool[Math.floor(Math.random() * pool.length)];
   $('speech2').textContent = msg;
   $('speech3').textContent = msg;
 }
