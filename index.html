@@ -9,145 +9,175 @@
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#FFF8F0;min-height:100vh;display:flex;justify-content:center;}
 #root{width:100%;max-width:480px;padding:1.2rem 1rem 3rem;}
 
-/* ===== 共通 ===== */
-.screen{display:none;flex-direction:column;align-items:center;gap:1.1rem;}
+.screen{display:none;flex-direction:column;align-items:center;gap:1rem;}
 .screen.on{display:flex;}
 h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
 .sub{font-size:13px;color:#888;text-align:center;line-height:1.6;}
-.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-.divider{width:100%;height:1px;background:#E8E4DF;margin:.2rem 0;}
+.divider{width:100%;height:1px;background:#E8E4DF;margin:.1rem 0;}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
 
-/* ===== ボタン ===== */
-.btn{padding:12px 30px;border-radius:14px;border:1.5px solid #D0C8C0;background:#fff;color:#1a1a18;font-size:15px;cursor:pointer;font-family:inherit;}
+/* ボタン */
+.btn{padding:12px 28px;border-radius:14px;border:1.5px solid #D0C8C0;background:#fff;color:#1a1a18;font-size:15px;cursor:pointer;font-family:inherit;transition:background .12s;}
+.btn:hover{background:#F0EDE8;}
 .btn.primary{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600;}
+.btn.primary:hover{background:#0F6E56;}
 .btn.primary:disabled{background:#A8DCC8;border-color:#A8DCC8;cursor:default;}
 .btn.ghost{background:transparent;border-color:#ccc;color:#777;font-size:13px;padding:8px 18px;}
 
-/* ===== 画面1: キャラ・年齢選択 ===== */
-.char-cards{display:flex;gap:20px;}
-.ccard{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 22px;border-radius:20px;border:2.5px solid #D0C8C0;background:#fff;cursor:pointer;transition:all .15s;}
-.ccard svg{width:88px;height:88px;}
+/* ===== 画面1 キャラ・年齢・レベル選択 ===== */
+.char-cards{display:flex;gap:18px;}
+.ccard{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 18px;border-radius:20px;border:2.5px solid #D0C8C0;background:#fff;cursor:pointer;transition:all .15s;}
+.ccard svg{width:84px;height:84px;}
 .ccard-label{font-size:13px;font-weight:600;color:#888;}
 .ccard.sel.boy{border-color:#5BA4D4;background:#EAF4FC;}
 .ccard.sel.girl{border-color:#E07BAC;background:#FDF0F6;}
 .ccard.sel.boy .ccard-label{color:#1E6FA0;}
 .ccard.sel.girl .ccard-label{color:#C0467E;}
-.age-row{display:flex;gap:10px;}
-.atab{padding:9px 22px;border-radius:22px;border:1.5px solid #D0C8C0;background:#fff;color:#777;font-size:14px;cursor:pointer;font-family:inherit;}
+
+.age-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.atab{padding:9px 20px;border-radius:22px;border:1.5px solid #D0C8C0;background:#fff;color:#777;font-size:14px;cursor:pointer;font-family:inherit;transition:all .14s;}
 .atab.sel{background:#1D9E75;color:#fff;border-color:#1D9E75;font-weight:600;}
 
-/* ===== 画面2: カメラ確認 ===== */
-.cam-frame{position:relative;width:260px;height:196px;border-radius:18px;overflow:hidden;border:2px solid #D0C8C0;background:#111;flex-shrink:0;}
+/* レベル設定（目標口数） */
+.level-selector{display:flex;align-items:center;gap:14px;}
+.level-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid #D0C8C0;background:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;}
+.level-btn:hover{background:#F0EDE8;}
+.level-val{font-size:32px;font-weight:700;color:#1a1a18;min-width:60px;text-align:center;}
+.level-unit{font-size:14px;color:#888;}
+
+/* ===== 画面2 カメラ確認 ===== */
+.cam-frame{width:260px;height:196px;border-radius:18px;overflow:hidden;border:2px solid #D0C8C0;background:#111;}
 .cam-frame video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
 .cam-status-bar{display:flex;align-items:center;gap:7px;font-size:13px;color:#555;}
-.sdot{width:10px;height:10px;border-radius:50%;background:#ccc;}
+.sdot{width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0;}
 .sdot.on{background:#1D9E75;}
 .sdot.cal{background:#EF9F27;}
 
-/* ===== キャラクターエリア ===== */
-.char-area{display:flex;align-items:flex-end;gap:1.2rem;}
+/* キャラクターエリア */
+.char-area{display:flex;align-items:flex-end;gap:1rem;}
 .chew-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .chew-col span{font-size:11px;color:#999;}
-.chew-bar-wrap{width:16px;height:84px;background:#EDECEA;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border:.5px solid #D0C8C0;}
+.chew-bar-wrap{width:16px;height:80px;background:#EDECEA;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;border:.5px solid #D0C8C0;}
 .chew-bar{width:100%;background:#1D9E75;transition:height .08s;}
-.chew-n{font-size:18px;font-weight:700;color:#1a1a18;}
-.speech{background:#fff;border:1.5px solid #D0C8C0;border-radius:12px;padding:9px 13px;font-size:13px;color:#1a1a18;max-width:170px;line-height:1.5;}
+.chew-n{font-size:17px;font-weight:700;color:#1a1a18;}
+.speech{background:#fff;border:1.5px solid #D0C8C0;border-radius:12px;padding:9px 12px;font-size:13px;color:#1a1a18;max-width:160px;line-height:1.5;}
 
-/* ===== 画面3: ゲーム ===== */
+/* ===== 画面3 ゲーム ===== */
 .badge-row{width:100%;display:flex;justify-content:space-between;}
-.badge{border-radius:20px;padding:5px 16px;font-size:13px;font-weight:500;}
+.badge{border-radius:20px;padding:5px 15px;font-size:13px;font-weight:500;}
 .bg{background:#E1F5EE;border:1px solid #5DCAA5;color:#085041;}
 .ba{background:#FAEEDA;border:1px solid #EF9F27;color:#412402;}
-.timer-num{font-size:56px;font-weight:500;color:#1a1a18;letter-spacing:2px;font-variant-numeric:tabular-nums;}
-.prog-wrap{width:100%;max-width:360px;height:20px;background:#EDECEA;border-radius:10px;overflow:hidden;}
-.prog-fill{height:100%;background:#1D9E75;border-radius:10px;transition:width .5s linear;}
+.br{background:#FCEAEA;border:1px solid #F09595;color:#501313;}
+
+/* 口数メイン表示 */
+.bite-display{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.bite-label{font-size:12px;color:#888;}
+.bite-nums{display:flex;align-items:baseline;gap:6px;}
+.bite-current{font-size:64px;font-weight:700;color:#1a1a18;line-height:1;font-variant-numeric:tabular-nums;}
+.bite-sep{font-size:22px;color:#ccc;}
+.bite-goal{font-size:28px;font-weight:600;color:#aaa;font-variant-numeric:tabular-nums;}
+
+/* 口数プログレスバー */
+.bite-prog-wrap{width:100%;max-width:360px;height:18px;background:#EDECEA;border-radius:9px;overflow:hidden;}
+.bite-prog-fill{height:100%;background:#EF9F27;border-radius:9px;transition:width .3s ease;}
+
+/* タイマー */
+.timer-num{font-size:42px;font-weight:500;color:#888;letter-spacing:1px;font-variant-numeric:tabular-nums;}
+
+/* 「1口！」ボタン */
+.bite-btn{width:100%;max-width:320px;padding:20px;border-radius:20px;border:none;background:#EF9F27;color:#fff;font-size:22px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 #B87520;transition:transform .08s,box-shadow .08s;active-transform:translateY(2px);}
+.bite-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #B87520;}
+
+/* もぐもぐメーター（小） */
+.chew-mini{display:flex;align-items:center;gap:8px;font-size:12px;color:#999;}
+.chew-mini-bar-wrap{width:100px;height:10px;background:#EDECEA;border-radius:5px;overflow:hidden;}
+.chew-mini-bar{height:100%;background:#1D9E75;transition:width .08s;border-radius:5px;}
+
 .missions{width:100%;max-width:380px;display:flex;flex-direction:column;gap:6px;}
-.mission{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:.5px solid #D0C8C0;background:#fff;}
+.mission{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;border:.5px solid #D0C8C0;background:#fff;}
 .mission.done{opacity:.5;background:#F5F3F0;}
 .mi{font-size:18px;width:26px;text-align:center;}
 .mt{flex:1;font-size:13px;color:#1a1a18;}
 .mp{font-size:12px;font-weight:500;color:#0F6E56;background:#E1F5EE;border-radius:10px;padding:2px 10px;}
 .mission.done .mp{color:#888;background:#EDECEA;}
-.stamps{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:34px;max-width:340px;}
-.stamp{width:36px;height:36px;border-radius:50%;background:#E1F5EE;border:1.5px solid #5DCAA5;display:flex;align-items:center;justify-content:center;font-size:18px;animation:pop .3s;}
-@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
-.result-box{padding:16px;border-radius:14px;border:1.5px solid #5DCAA5;background:#E1F5EE;text-align:center;font-size:15px;font-weight:500;color:#085041;display:none;width:100%;max-width:360px;line-height:1.9;}
 
-/* ===== キャラSVGアニメ ===== */
+.stamps{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:32px;max-width:340px;}
+.stamp{width:34px;height:34px;border-radius:50%;background:#E1F5EE;border:1.5px solid #5DCAA5;display:flex;align-items:center;justify-content:center;font-size:17px;animation:pop .3s;}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* クリア画面 */
+.clear-box{padding:20px;border-radius:18px;border:2px solid #5DCAA5;background:#E1F5EE;text-align:center;font-size:16px;font-weight:600;color:#085041;display:none;width:100%;max-width:360px;line-height:2;}
+.clear-box .emoji{font-size:48px;display:block;margin-bottom:6px;}
+
+/* アニメ */
 .bounce{animation:bnc .4s ease;}
-@keyframes bnc{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes bnc{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+.pop-bite{animation:popbite .25s ease;}
+@keyframes popbite{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
 </style>
 </head>
 <body>
 <div id="root">
 
-<!-- ===================== 画面1: キャラ・年齢選択 ===================== -->
+<!-- ====================================================
+     画面1: キャラ・年齢・目標口数 選択
+===================================================== -->
 <div class="screen on" id="s1">
   <h1>🍽 もぐもぐタイム！</h1>
 
   <p class="sub">キャラクターをえらんでね</p>
   <div class="char-cards">
+    <!-- 男の子 -->
     <div class="ccard boy" id="cBoy" onclick="pickChar('boy')">
       <svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
-        <!-- 体(青) -->
         <ellipse cx="44" cy="76" rx="24" ry="14" fill="#5BA4D4"/>
-        <!-- 頭 -->
         <circle cx="44" cy="40" r="26" fill="#FAC775"/>
-        <!-- 短い髪 -->
         <path d="M18 36 Q18 12 44 12 Q70 12 70 36" fill="#5C3A1E"/>
         <rect x="17" y="29" width="6" height="12" rx="3" fill="#5C3A1E"/>
         <rect x="65" y="29" width="6" height="12" rx="3" fill="#5C3A1E"/>
-        <!-- 耳 -->
         <circle cx="18" cy="40" r="7" fill="#EF9F27"/>
         <circle cx="70" cy="40" r="7" fill="#EF9F27"/>
-        <!-- 目 -->
         <ellipse cx="34" cy="37" rx="4" ry="5" fill="#2C2C2A"/>
         <ellipse cx="54" cy="37" rx="4" ry="5" fill="#2C2C2A"/>
         <circle cx="35.5" cy="34.5" r="1.5" fill="white"/>
         <circle cx="55.5" cy="34.5" r="1.5" fill="white"/>
-        <!-- 口 -->
         <path d="M36 50 Q44 56 52 50" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- ほっぺ -->
         <ellipse cx="27" cy="44" rx="5" ry="3" fill="#F4B878" opacity=".45"/>
         <ellipse cx="61" cy="44" rx="5" ry="3" fill="#F4B878" opacity=".45"/>
+        <!-- 腕 -->
+        <line x1="20" y1="68" x2="8"  y2="80" stroke="#FAC775" stroke-width="9" stroke-linecap="round"/>
+        <line x1="68" y1="68" x2="80" y2="80" stroke="#FAC775" stroke-width="9" stroke-linecap="round"/>
       </svg>
       <div class="ccard-label">👦 男の子</div>
     </div>
 
+    <!-- 女の子 -->
     <div class="ccard girl" id="cGirl" onclick="pickChar('girl')">
       <svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
-        <!-- 体(ピンク) -->
         <ellipse cx="44" cy="76" rx="24" ry="14" fill="#E07BAC"/>
-        <!-- 後ろ髪 -->
         <path d="M18 34 Q14 66 20 78 Q30 84 44 84 Q58 84 68 78 Q74 66 70 34 Q68 12 44 12 Q20 12 18 34Z" fill="#3D1F0A"/>
-        <!-- 頭 -->
         <circle cx="44" cy="40" r="26" fill="#FAC775"/>
-        <!-- 前髪 -->
         <path d="M18 38 Q18 12 44 12 Q70 12 70 38" fill="#3D1F0A"/>
-        <!-- リボン -->
         <ellipse cx="34" cy="14" rx="9" ry="5" fill="#E07BAC"/>
         <ellipse cx="54" cy="14" rx="9" ry="5" fill="#E07BAC"/>
         <circle cx="44" cy="14" r="5" fill="#C0467E"/>
-        <!-- 耳 -->
         <circle cx="18" cy="40" r="7" fill="#EF9F27"/>
         <circle cx="70" cy="40" r="7" fill="#EF9F27"/>
-        <!-- 目 -->
         <ellipse cx="34" cy="37" rx="4" ry="5" fill="#2C2C2A"/>
         <ellipse cx="54" cy="37" rx="4" ry="5" fill="#2C2C2A"/>
         <circle cx="35.5" cy="34.5" r="1.5" fill="white"/>
         <circle cx="55.5" cy="34.5" r="1.5" fill="white"/>
-        <!-- まつ毛 -->
         <line x1="30" y1="33" x2="28" y2="30" stroke="#2C2C2A" stroke-width="1.2"/>
         <line x1="34" y1="32" x2="34" y2="29" stroke="#2C2C2A" stroke-width="1.2"/>
         <line x1="38" y1="33" x2="40" y2="30" stroke="#2C2C2A" stroke-width="1.2"/>
         <line x1="50" y1="33" x2="48" y2="30" stroke="#2C2C2A" stroke-width="1.2"/>
         <line x1="54" y1="32" x2="54" y2="29" stroke="#2C2C2A" stroke-width="1.2"/>
         <line x1="58" y1="33" x2="60" y2="30" stroke="#2C2C2A" stroke-width="1.2"/>
-        <!-- ほっぺ -->
         <ellipse cx="27" cy="44" rx="5" ry="3" fill="#F4A0C0" opacity=".6"/>
         <ellipse cx="61" cy="44" rx="5" ry="3" fill="#F4A0C0" opacity=".6"/>
-        <!-- 口 -->
         <path d="M36 50 Q44 56 52 50" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <line x1="20" y1="68" x2="8"  y2="80" stroke="#FAC775" stroke-width="9" stroke-linecap="round"/>
+        <line x1="68" y1="68" x2="80" y2="80" stroke="#FAC775" stroke-width="9" stroke-linecap="round"/>
       </svg>
       <div class="ccard-label">👧 女の子</div>
     </div>
@@ -161,58 +191,61 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
     <button class="atab" onclick="pickAge(5)">5〜6歳</button>
   </div>
 
+  <div class="divider"></div>
+  <p class="sub">目標の口数をえらんでね</p>
+  <div class="level-selector">
+    <button class="level-btn" onclick="changeGoal(-20)">－</button>
+    <div>
+      <div class="level-val" id="goalVal">20</div>
+    </div>
+    <button class="level-btn" onclick="changeGoal(+20)">＋</button>
+    <div class="level-unit">口</div>
+  </div>
+
   <button class="btn primary" id="s1Next" onclick="goS2()" disabled>次へ →</button>
 </div>
 
-<!-- ===================== 画面2: カメラ確認 + スタート ===================== -->
+<!-- ====================================================
+     画面2: カメラ確認 + スタートボタン
+===================================================== -->
 <div class="screen" id="s2">
   <h1>📷 カメラ確認</h1>
 
   <div class="cam-frame">
     <video id="video" autoplay playsinline muted></video>
   </div>
-
   <div class="cam-status-bar">
     <div class="sdot" id="sdot"></div>
     <span id="stext">カメラを起動しています...</span>
   </div>
 
-  <!-- キャラクタープレビュー（口連動確認用） -->
+  <!-- キャラクタープレビュー -->
   <div class="char-area">
     <div class="chew-col">
       <span>もぐもぐ</span>
-      <div class="chew-bar-wrap"><div class="chew-bar" id="chewBar" style="height:0%"></div></div>
+      <div class="chew-bar-wrap"><div class="chew-bar" id="chewBar2" style="height:0%"></div></div>
       <div class="chew-n" id="chewN2">0</div>
     </div>
 
-    <svg id="charSvg2" width="130" height="130" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="char-main">
-      <!-- 後ろ髪（女の子） -->
+    <svg id="charSvg2" width="130" height="130" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <path id="c2hairBack" d="" fill="#3D1F0A"/>
-      <!-- 体 -->
       <ellipse id="c2body" cx="60" cy="104" rx="34" ry="14" fill="#5BA4D4"/>
-      <!-- 左腕（動く） -->
-      <line id="c2armL" x1="30" y1="92" x2="14" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
-      <!-- 右腕（動く） -->
-      <line id="c2armR" x1="90" y1="92" x2="106" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
-      <!-- 頭 -->
+      <!-- 腕（固定） -->
+      <ellipse cx="30" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(-22,30,106)"/>
+      <ellipse cx="90" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(22,90,106)"/>
       <circle cx="60" cy="54" r="34" fill="#FAC775"/>
-      <!-- 耳 -->
       <circle cx="26" cy="54" r="10" fill="#EF9F27"/>
       <circle cx="94" cy="54" r="10" fill="#EF9F27"/>
-      <!-- 男の子の髪 -->
       <path id="c2hb" d="M26 46 Q26 18 60 18 Q94 18 94 46" fill="#5C3A1E"/>
       <rect id="c2hbL" x="24" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
       <rect id="c2hbR" x="89" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
-      <!-- 女の子の前髪 -->
       <path id="c2hg" d="" fill="#3D1F0A"/>
-      <!-- リボン -->
       <g id="c2ribbon" opacity="0">
         <ellipse cx="42" cy="20" rx="12" ry="6" fill="#E07BAC"/>
         <ellipse cx="78" cy="20" rx="12" ry="6" fill="#E07BAC"/>
         <circle cx="60" cy="20" r="6" fill="#C0467E"/>
         <circle cx="60" cy="20" r="3" fill="#F4A0C0"/>
       </g>
-      <!-- まつ毛 -->
       <g id="c2lash" opacity="0">
         <line x1="42" y1="45" x2="38" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
         <line x1="47" y1="43" x2="47" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
@@ -221,26 +254,20 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
         <line x1="73" y1="43" x2="73" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
         <line x1="78" y1="45" x2="82" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
       </g>
-      <!-- ほっぺ -->
       <ellipse id="c2chkL" cx="32" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
       <ellipse id="c2chkR" cx="88" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
-      <!-- 目 -->
       <ellipse id="c2eL" cx="46" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
       <ellipse id="c2eR" cx="74" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
       <circle cx="48" cy="47" r="2" fill="white"/>
       <circle cx="76" cy="47" r="2" fill="white"/>
-      <!-- 上唇（固定） -->
       <path d="M50 65 Q60 65 70 65" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <!-- 顎（動く） -->
       <ellipse id="c2jaw" cx="60" cy="69" rx="10" ry="4" fill="#FAC775"/>
-      <!-- 下唇（動く） -->
       <path id="c2lip" d="M50 69 Q60 75 70 69" stroke="#2C2C2A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <!-- スプーン -->
       <rect x="88" y="84" width="4" height="24" rx="2" fill="#888780"/>
       <ellipse cx="90" cy="82" rx="6" ry="5" fill="#B4B2A9"/>
     </svg>
 
-    <div class="speech" id="speech2">もぐもぐしてみて！<br>口が動いたら<br>キャラも動くよ！</div>
+    <div class="speech" id="speech2">口を動かすと<br>キャラも動くよ！</div>
   </div>
 
   <p class="sub" id="calNotice">顔が映るまでお待ちください</p>
@@ -251,69 +278,89 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
   </div>
 </div>
 
-<!-- ===================== 画面3: ゲーム ===================== -->
+<!-- ====================================================
+     画面3: ゲーム
+===================================================== -->
 <div class="screen" id="s3">
-  <!-- バッジ -->
   <div class="badge-row">
     <div class="badge bg" id="lvBadge">レベル 1</div>
     <div class="badge ba" id="ptBadge">⭐ 0 pt</div>
+    <div class="badge br" id="goalBadge">目標 20口</div>
   </div>
 
-  <!-- キャラクター（ゲーム中・カメラ表示なし） -->
-  <div class="char-area" style="justify-content:center;">
-    <div class="chew-col">
-      <span>もぐもぐ</span>
-      <div class="chew-bar-wrap"><div class="chew-bar" id="chewBar3" style="height:0%"></div></div>
-      <div class="chew-n" id="chewN3">0</div>
+  <!-- キャラクター（大） -->
+  <svg id="charSvg3" width="150" height="150" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path id="c3hairBack" d="" fill="#3D1F0A"/>
+    <ellipse id="c3body" cx="60" cy="104" rx="34" ry="14" fill="#5BA4D4"/>
+    <ellipse cx="30" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(-22,30,106)"/>
+    <ellipse cx="90" cy="106" rx="13" ry="7" fill="#FAC775" transform="rotate(22,90,106)"/>
+    <circle cx="60" cy="54" r="34" fill="#FAC775"/>
+    <circle cx="26" cy="54" r="10" fill="#EF9F27"/>
+    <circle cx="94" cy="54" r="10" fill="#EF9F27"/>
+    <path id="c3hb" d="M26 46 Q26 18 60 18 Q94 18 94 46" fill="#5C3A1E"/>
+    <rect id="c3hbL" x="24" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
+    <rect id="c3hbR" x="89" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
+    <path id="c3hg" d="" fill="#3D1F0A"/>
+    <g id="c3ribbon" opacity="0">
+      <ellipse cx="42" cy="20" rx="12" ry="6" fill="#E07BAC"/>
+      <ellipse cx="78" cy="20" rx="12" ry="6" fill="#E07BAC"/>
+      <circle cx="60" cy="20" r="6" fill="#C0467E"/>
+      <circle cx="60" cy="20" r="3" fill="#F4A0C0"/>
+    </g>
+    <g id="c3lash" opacity="0">
+      <line x1="42" y1="45" x2="38" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
+      <line x1="47" y1="43" x2="47" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
+      <line x1="52" y1="45" x2="56" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
+      <line x1="68" y1="45" x2="64" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
+      <line x1="73" y1="43" x2="73" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
+      <line x1="78" y1="45" x2="82" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
+    </g>
+    <ellipse id="c3chkL" cx="32" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
+    <ellipse id="c3chkR" cx="88" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
+    <ellipse id="c3eL" cx="46" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
+    <ellipse id="c3eR" cx="74" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
+    <circle cx="48" cy="47" r="2" fill="white"/>
+    <circle cx="76" cy="47" r="2" fill="white"/>
+    <path d="M50 65 Q60 65 70 65" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse id="c3jaw" cx="60" cy="69" rx="10" ry="4" fill="#FAC775"/>
+    <path id="c3lip" d="M50 69 Q60 75 70 69" stroke="#2C2C2A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <rect x="88" y="84" width="4" height="24" rx="2" fill="#888780"/>
+    <ellipse cx="90" cy="82" rx="6" ry="5" fill="#B4B2A9"/>
+  </svg>
+
+  <div class="speech" id="speech3">もぐもぐ！がんばれ！</div>
+
+  <!-- 口数メイン表示 -->
+  <div class="bite-display">
+    <div class="bite-label">食べた口数</div>
+    <div class="bite-nums">
+      <div class="bite-current" id="biteCount">0</div>
+      <div class="bite-sep">/</div>
+      <div class="bite-goal" id="biteGoalDisp">20</div>
     </div>
+  </div>
 
-    <svg id="charSvg3" width="140" height="140" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="char-main">
-      <path id="c3hairBack" d="" fill="#3D1F0A"/>
-      <ellipse id="c3body" cx="60" cy="104" rx="34" ry="14" fill="#5BA4D4"/>
-      <!-- 左腕（動く） -->
-      <line id="c3armL" x1="30" y1="92" x2="14" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
-      <!-- 右腕（動く） -->
-      <line id="c3armR" x1="90" y1="92" x2="106" y2="108" stroke="#FAC775" stroke-width="13" stroke-linecap="round"/>
-      <circle cx="60" cy="54" r="34" fill="#FAC775"/>
-      <circle cx="26" cy="54" r="10" fill="#EF9F27"/>
-      <circle cx="94" cy="54" r="10" fill="#EF9F27"/>
-      <path id="c3hb" d="M26 46 Q26 18 60 18 Q94 18 94 46" fill="#5C3A1E"/>
-      <rect id="c3hbL" x="24" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
-      <rect id="c3hbR" x="89" y="38" width="7" height="14" rx="4" fill="#5C3A1E"/>
-      <path id="c3hg" d="" fill="#3D1F0A"/>
-      <g id="c3ribbon" opacity="0">
-        <ellipse cx="42" cy="20" rx="12" ry="6" fill="#E07BAC"/>
-        <ellipse cx="78" cy="20" rx="12" ry="6" fill="#E07BAC"/>
-        <circle cx="60" cy="20" r="6" fill="#C0467E"/>
-        <circle cx="60" cy="20" r="3" fill="#F4A0C0"/>
-      </g>
-      <g id="c3lash" opacity="0">
-        <line x1="42" y1="45" x2="38" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
-        <line x1="47" y1="43" x2="47" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
-        <line x1="52" y1="45" x2="56" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
-        <line x1="68" y1="45" x2="64" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
-        <line x1="73" y1="43" x2="73" y2="39" stroke="#2C2C2A" stroke-width="1.8"/>
-        <line x1="78" y1="45" x2="82" y2="41" stroke="#2C2C2A" stroke-width="1.8"/>
-      </g>
-      <ellipse id="c3chkL" cx="32" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
-      <ellipse id="c3chkR" cx="88" cy="62" rx="9" ry="5" fill="#F4A0C0" opacity="0"/>
-      <ellipse id="c3eL" cx="46" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
-      <ellipse id="c3eR" cx="74" cy="50" rx="5" ry="6" fill="#2C2C2A"/>
-      <circle cx="48" cy="47" r="2" fill="white"/>
-      <circle cx="76" cy="47" r="2" fill="white"/>
-      <path d="M50 65 Q60 65 70 65" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <ellipse id="c3jaw" cx="60" cy="69" rx="10" ry="4" fill="#FAC775"/>
-      <path id="c3lip" d="M50 69 Q60 75 70 69" stroke="#2C2C2A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <rect x="88" y="84" width="4" height="24" rx="2" fill="#888780"/>
-      <ellipse cx="90" cy="82" rx="6" ry="5" fill="#B4B2A9"/>
-    </svg>
+  <!-- 口数プログレスバー -->
+  <div class="bite-prog-wrap">
+    <div class="bite-prog-fill" id="biteProgFill" style="width:0%"></div>
+  </div>
 
-    <div class="speech" id="speech3">もぐもぐ！<br>がんばれ！</div>
+  <!-- もぐもぐカウンター（小さく） -->
+  <div class="chew-mini">
+    <span>もぐもぐ</span>
+    <div class="chew-mini-bar-wrap">
+      <div class="chew-mini-bar" id="chewMiniBar" style="width:0%"></div>
+    </div>
+    <span id="chewMiniN">0</span>
   </div>
 
   <!-- タイマー -->
   <div class="timer-num" id="timerEl">00:00</div>
-  <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:100%"></div></div>
+
+  <!-- 「1口！」ボタン -->
+  <button class="bite-btn" id="biteBtn" onclick="addBite()">
+    🍴 1口！
+  </button>
 
   <!-- ミッション -->
   <div class="missions" id="missionEl"></div>
@@ -321,95 +368,95 @@ h1{font-size:22px;font-weight:700;color:#1a1a18;text-align:center;}
   <!-- スタンプ -->
   <div class="stamps" id="stampsEl"></div>
 
-  <!-- 結果 -->
-  <div class="result-box" id="resultEl"></div>
+  <!-- クリア -->
+  <div class="clear-box" id="clearBox">
+    <span class="emoji">🎉</span>
+    <span id="clearMsg"></span>
+  </div>
 
-  <button class="btn ghost" onclick="goS1()">← 最初から</button>
+  <button class="btn ghost" style="margin-top:.5rem" onclick="goS1()">← 最初から</button>
 </div>
 
-</div><!-- /root -->
+</div>
 
 <!-- MediaPipe -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 <script>
 // ============================================================
-//  定数・設定
+// データ
 // ============================================================
 const CFGS = {
-  1:{mins:3, missions:[
-    {id:'c20', icon:'🍚', text:'20回もぐもぐした！', pts:10, done:false},
-    {id:'half',icon:'⏰', text:'半分まで食べた！',   pts:8,  done:false},
-    {id:'fin', icon:'🎉', text:'ぜんぶたべた！',     pts:20, done:false},
+  1:{mins:5, missions:[
+    {id:'b5',  icon:'🍚', text:'5口食べた！',    pts:8,  done:false},
+    {id:'chew30',icon:'👄',text:'30回もぐもぐ！', pts:5,  done:false},
+    {id:'clear',icon:'🎉', text:'目標口数クリア！',pts:20, done:false},
   ]},
-  3:{mins:8, missions:[
-    {id:'c30', icon:'🍚', text:'30回もぐもぐした！', pts:10, done:false},
-    {id:'half',icon:'⏰', text:'半分まで食べた！',   pts:8,  done:false},
-    {id:'c60', icon:'💪', text:'60回もぐもぐ達成！', pts:15, done:false},
-    {id:'fin', icon:'🎉', text:'ぜんぶたべた！',     pts:25, done:false},
+  3:{mins:10, missions:[
+    {id:'b5',  icon:'🍚', text:'5口食べた！',     pts:5,  done:false},
+    {id:'b10', icon:'🍱', text:'10口食べた！',    pts:8,  done:false},
+    {id:'chew50',icon:'👄',text:'50回もぐもぐ！', pts:8,  done:false},
+    {id:'clear',icon:'🎉', text:'目標口数クリア！',pts:25, done:false},
   ]},
   5:{mins:15, missions:[
-    {id:'c50', icon:'🍚', text:'50回もぐもぐした！', pts:10, done:false},
-    {id:'half',icon:'⏰', text:'半分まで食べた！',   pts:8,  done:false},
-    {id:'c100',icon:'💪', text:'100回もぐもぐ達成！',pts:20, done:false},
-    {id:'fin', icon:'🎉', text:'ぜんぶたべた！',     pts:30, done:false},
+    {id:'b5',  icon:'🍚', text:'5口食べた！',     pts:5,  done:false},
+    {id:'b10', icon:'🍱', text:'10口食べた！',    pts:8,  done:false},
+    {id:'b20', icon:'💪', text:'20口食べた！',    pts:12, done:false},
+    {id:'chew100',icon:'👄',text:'100回もぐもぐ！',pts:10, done:false},
+    {id:'clear',icon:'🎉', text:'目標口数クリア！',pts:30, done:false},
   ]},
 };
 const STAMPS  = ['🍙','🥕','🐟','🍠','🥦','🍳','🍜','🍱','🍎','🥚'];
-const SPEECH  = ['もぐもぐ！えらい！','おいしいかな？','すごい！','もう少し！','もぐもぐ名人！'];
+const SPEECH_CHEW = ['もぐもぐ！えらい！','おいしいかな？','よくかんでね！','もぐもぐ名人！','上手！'];
+const SPEECH_BITE = ['1口たべたね！','えらい！','どんどん食べよう！','おいしい？','すごい！'];
 
 // ============================================================
-//  状態
+// 状態
 // ============================================================
-let charType = null;   // 'boy' | 'girl'
-let ageKey   = null;   // 1 | 3 | 5
-let cfg      = null;
+let charType = null, ageKey = null, goalBites = 20;
+let cfg = null, totalSec = 0, remaining = 0, timerInt = null;
+let points = 0, stampArr = [];
 
-let totalSec = 0, remaining = 0, timerInt = null;
-let points = 0, stampArr = [], halfDone = false;
-
-// 咀嚼カウント（画面2・3 共有）
+// もぐもぐカウンター（口ボタンを押すたびにリセット）
 let chewCount = 0;
+// 口数カウンター
+let biteCount = 0;
+// クリア済みフラグ
+let cleared = false;
 
 // MediaPipe
-let mpReady = false;
-let mpCamera = null;
-
-// 顎ピーク検出用
-let jawBaseline  = null;
-let jawSamples   = [];
-let inPeak       = false;
+let mpReady = false, mpCamera = null;
+let jawBaseline = null, jawSamples = [], inPeak = false;
 
 // ============================================================
-//  DOM ヘルパ
+// DOM
 // ============================================================
-const $  = id => document.getElementById(id);
-const S1 = $('s1'), S2 = $('s2'), S3 = $('s3');
-
+const $ = id => document.getElementById(id);
+const S1=$('s1'), S2=$('s2'), S3=$('s3');
 function showScreen(s){ [S1,S2,S3].forEach(x=>x.classList.remove('on')); s.classList.add('on'); }
 
 // ============================================================
-//  画面1: キャラ・年齢選択
+// 画面1
 // ============================================================
 function pickChar(t){
-  charType = t;
-  $('cBoy').className  = 'ccard boy'  + (t==='boy'  ? ' sel' : '');
-  $('cGirl').className = 'ccard girl' + (t==='girl' ? ' sel' : '');
+  charType=t;
+  $('cBoy').className  = 'ccard boy'  + (t==='boy'  ? ' sel':'');
+  $('cGirl').className = 'ccard girl' + (t==='girl' ? ' sel':'');
   checkS1();
 }
 function pickAge(a){
-  ageKey = a;
-  document.querySelectorAll('.atab').forEach((el,i)=>{
-    el.classList.toggle('sel', [1,3,5][i]===a);
-  });
+  ageKey=a;
+  document.querySelectorAll('.atab').forEach((el,i)=>el.classList.toggle('sel',[1,3,5][i]===a));
   checkS1();
+}
+function changeGoal(delta){
+  goalBites = Math.max(20, Math.min(200, goalBites + delta));
+  $('goalVal').textContent = goalBites;
 }
 function checkS1(){ $('s1Next').disabled = !(charType && ageKey); }
 
 function goS1(){
-  // タイマー停止
   if(timerInt){ clearInterval(timerInt); timerInt=null; }
   charType=null; ageKey=null;
   $('cBoy').className='ccard boy'; $('cGirl').className='ccard girl';
@@ -419,402 +466,311 @@ function goS1(){
 }
 
 // ============================================================
-//  画面2: カメラ起動 + キャラ表示
+// 画面2
 // ============================================================
 function goS2(){
-  applyCharStyle('c2');   // キャラ外見を反映
-  chewCount=0; updateChewUI(0);
+  applyCharStyle('c2');
+  chewCount=0; updateChewUI();
   jawBaseline=null; jawSamples=[]; inPeak=false;
   showScreen(S2);
   startCamera();
 }
 
 // ============================================================
-//  キャラクター外見 適用（prefix: 'c2' or 'c3'）
+// キャラ外見適用
 // ============================================================
 function applyCharStyle(p){
-  const isBoy = charType === 'boy';
-
-  // 体の色
+  const isBoy = charType==='boy';
   $(p+'body').setAttribute('fill', isBoy ? '#5BA4D4' : '#E07BAC');
-
-  // 男の子の髪
-  [p+'hb', p+'hbL', p+'hbR'].forEach(id => {
-    $(id) && $(id).setAttribute('opacity', isBoy ? '1' : '0');
-  });
-
-  // 女の子の髪
+  [p+'hb',p+'hbL',p+'hbR'].forEach(id=>{ const el=$(id); if(el) el.setAttribute('opacity', isBoy?'1':'0'); });
   if(!isBoy){
-    $(p+'hairBack').setAttribute('d',
-      'M26 22 Q20 64 28 88 Q40 96 60 96 Q80 96 92 88 Q100 64 94 22 Q90 14 60 14 Q30 14 26 22Z');
+    $(p+'hairBack').setAttribute('d','M26 22 Q20 64 28 88 Q40 96 60 96 Q80 96 92 88 Q100 64 94 22 Q90 14 60 14 Q30 14 26 22Z');
     $(p+'hairBack').setAttribute('opacity','1');
     $(p+'hg').setAttribute('d','M26 48 Q26 16 60 16 Q94 16 94 48');
     $(p+'hg').setAttribute('opacity','1');
   } else {
-    $(p+'hairBack').setAttribute('d','');
-    $(p+'hairBack').setAttribute('opacity','0');
-    $(p+'hg').setAttribute('d','');
-    $(p+'hg').setAttribute('opacity','0');
+    $(p+'hairBack').setAttribute('d',''); $(p+'hairBack').setAttribute('opacity','0');
+    $(p+'hg').setAttribute('d','');       $(p+'hg').setAttribute('opacity','0');
   }
-
-  // 女の子専用パーツ
-  $(p+'ribbon').setAttribute('opacity', isBoy ? '0' : '1');
-  $(p+'lash')  && $(p+'lash').setAttribute('opacity',  isBoy ? '0' : '1');
-  $(p+'chkL').setAttribute('opacity', isBoy ? '0' : '0.55');
-  $(p+'chkR').setAttribute('opacity', isBoy ? '0' : '0.55');
+  $(p+'ribbon').setAttribute('opacity', isBoy?'0':'1');
+  const lash=$(p+'lash'); if(lash) lash.setAttribute('opacity', isBoy?'0':'1');
+  $(p+'chkL').setAttribute('opacity', isBoy?'0':'0.55');
+  $(p+'chkR').setAttribute('opacity', isBoy?'0':'0.55');
 }
 
 // ============================================================
-//  口の動き: ratio 0.0〜1.0 で顎を動かす（prefix指定）
+// 口の動き
 // ============================================================
 function setMouth(p, ratio){
-  const baseY = 69, openY = 82;
-  const y  = baseY + (openY - baseY) * ratio;
-  const ry = 4     + 7              * ratio;
+  const baseY=69, openY=82;
+  const y  = baseY + (openY-baseY)*ratio;
+  const ry = 4 + 7*ratio;
   $(p+'jaw').setAttribute('cy',  y.toFixed(2));
   $(p+'jaw').setAttribute('ry',  ry.toFixed(2));
-  // 顎パーツの肌色を頭と合わせてつなぎ目を隠す
-  $(p+'jaw').setAttribute('fill', '#FAC775');
-  $(p+'lip').setAttribute('d',
-    `M50 ${baseY} Q60 ${(y + 6*ratio).toFixed(2)} 70 ${baseY}`);
+  $(p+'lip').setAttribute('d', `M50 ${baseY} Q60 ${(y+6*ratio).toFixed(2)} 70 ${baseY}`);
 }
-
-// ============================================================
-//  両方の画面のキャラに口を反映する
-// ============================================================
 function applyMouth(ratio){
   setMouth('c2', ratio);
   setMouth('c3', ratio);
 }
 
 // ============================================================
-//  咀嚼カウントUIを更新
+// もぐもぐUIの更新（画面2・画面3）
 // ============================================================
-function updateChewUI(n){
+function updateChewUI(){
   // 画面2
-  $('chewN2').textContent = n;
-  $('chewBar').style.height = Math.min(100, n) + '%';
-  // 画面3
-  $('chewN3').textContent = n;
-  $('chewBar3').style.height = Math.min(100, n) + '%';
+  $('chewBar2').style.height = Math.min(100, chewCount) + '%';
+  $('chewN2').textContent = chewCount;
+  // 画面3（ミニバー）
+  $('chewMiniBar').style.width  = Math.min(100, chewCount) + '%';
+  $('chewMiniN').textContent = chewCount;
 }
 
 // ============================================================
-//  MediaPipe カメラ起動
+// 口数カウント（ボタン押下）
 // ============================================================
-async function startCamera(){
-  const sdot  = $('sdot');
-  const stext = $('stext');
-  sdot.className = 'sdot cal';
-  stext.textContent = 'カメラを起動しています...';
+function addBite(){
+  if(cleared) return;
+  biteCount++;
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user', width: 320, height: 240 },
-      audio: false
-    });
-    const video = $('video');
-    video.srcObject = stream;
-    await new Promise(res => { video.onloadedmetadata = res; });
+  // 表示更新
+  $('biteCount').textContent = biteCount;
+  const pct = Math.min(100, Math.round(biteCount / goalBites * 100));
+  $('biteProgFill').style.width = pct + '%';
 
-    // FaceMesh 初期化（口・咀嚼検知）
-    const fm = new FaceMesh({ locateFile: f =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
-    });
-    fm.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.55,
-      minTrackingConfidence: 0.55,
-    });
-    fm.onResults(onFaceResults);
+  // もぐもぐカウンターをリセット
+  chewCount = 0;
+  updateChewUI();
 
-    // Pose 初期化（腕・手の検知）
-    const pose = new Pose({ locateFile: f =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`
-    });
-    pose.setOptions({
-      modelComplexity: 0,          // 軽量モデル（スマホ向け）
-      smoothLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-    pose.onResults(onPoseResults);
+  // キャラバウンス＋セリフ
+  bounceChar();
+  setSpeech(SPEECH_BITE[Math.floor(Math.random()*SPEECH_BITE.length)]);
 
-    // カメラループ：FaceMesh毎フレーム、Poseは2フレームおきで負荷分散
-    let frameCount = 0;
-    mpCamera = new Camera(video, {
-      onFrame: async () => {
-        frameCount++;
-        await fm.send({ image: video });
-        if(frameCount % 2 === 0) await pose.send({ image: video });
-      },
-      width: 320, height: 240
-    });
-    mpCamera.start();
+  // ミッションチェック
+  if(biteCount>=5)  completeMission('b5');
+  if(biteCount>=10) completeMission('b10');
+  if(biteCount>=20) completeMission('b20');
 
-    sdot.className = 'sdot on';
-    stext.textContent = '顔が映ったら口を動かしてみてね！手も動かせるよ🙌';
-    mpReady = true;
+  // ボタンのポップアニメ
+  const btn = $('biteBtn');
+  btn.classList.remove('pop-bite');
+  void btn.offsetWidth;
+  btn.classList.add('pop-bite');
+  setTimeout(()=>btn.classList.remove('pop-bite'), 250);
 
-  } catch(e) {
-    sdot.className = 'sdot';
-    stext.textContent = 'カメラの許可が必要です。ブラウザの設定を確認してください。';
-    $('calNotice').textContent = '';
-  }
+  // クリア判定
+  if(biteCount >= goalBites) showClear();
 }
 
 // ============================================================
-//  腕を動かす（肩→手先のline座標を更新）
+// クリア表示
 // ============================================================
-const ARM_DOWN = { L:{x:14,y:108}, R:{x:106,y:108} };
-const ARM_UP   = { L:{x:10,y:48},  R:{x:110,y:48}  };
-
-function applyArms(rL, rR){
-  ['c2','c3'].forEach(p=>{
-    const aL=$(p+'armL'), aR=$(p+'armR');
-    if(!aL||!aR) return;
-    // 左腕（カメラはミラーなので左右反転）
-    const lx = ARM_DOWN.L.x + (ARM_UP.L.x - ARM_DOWN.L.x)*rL;
-    const ly = ARM_DOWN.L.y + (ARM_UP.L.y - ARM_DOWN.L.y)*rL;
-    aL.setAttribute('x2', lx.toFixed(1));
-    aL.setAttribute('y2', ly.toFixed(1));
-    // 右腕
-    const rx = ARM_DOWN.R.x + (ARM_UP.R.x - ARM_DOWN.R.x)*rR;
-    const ry = ARM_DOWN.R.y + (ARM_UP.R.y - ARM_DOWN.R.y)*rR;
-    aR.setAttribute('x2', rx.toFixed(1));
-    aR.setAttribute('y2', ry.toFixed(1));
-  });
+function showClear(){
+  if(cleared) return;
+  cleared = true;
+  clearInterval(timerInt); timerInt = null;
+  completeMission('clear');
+  const lv = points<30?1:points<70?2:points<120?3:4;
+  $('clearBox').style.display = 'block';
+  $('clearMsg').innerHTML =
+    `${goalBites}口ぜんぶたべたね！<br>⭐ ${points}pt　レベル${lv}<br>もぐもぐ合計${biteCount}口！`;
+  setSpeech('やったー！ぜんぶたべた！🎉');
+  bounceChar();
+  $('biteBtn').disabled = true;
 }
 
 // ============================================================
-//  Pose コールバック（手の上げ下げ検出）
-// ============================================================
-let bothRaisedSaid = false;
-function onPoseResults(res){
-  if(!res.poseLandmarks){ applyArms(0,0); return; }
-  const lm = res.poseLandmarks;
-  // 11=左肩 12=右肩 15=左手首 16=右手首
-  const ls=lm[11], rs=lm[12], lw=lm[15], rw=lm[16];
-  if(!ls||!rs||!lw||!rw){ applyArms(0,0); return; }
-
-  const avgShoulderY = (ls.y + rs.y) / 2;
-  // 手首が肩より上にある割合（0〜1）。カメラY軸は下向きなので反転。
-  const rL = Math.min(1, Math.max(0, (avgShoulderY - lw.y + 0.04) / 0.22));
-  const rR = Math.min(1, Math.max(0, (avgShoulderY - rw.y + 0.04) / 0.22));
-
-  applyArms(rR, rL); // ミラー表示なので左右スワップ
-
-  // 両手を上げたら特別メッセージ
-  if(rL > 0.6 && rR > 0.6){
-    if(!bothRaisedSaid){
-      bothRaisedSaid = true;
-      randomSpeech(['やったー！🙌','すごい！両手！','えらい！']);
-    }
-  } else {
-    bothRaisedSaid = false;
-  }
-}
-
-// ============================================================
-//  FaceMesh コールバック ★ ここが口連動の核心 ★
+// FaceMesh コールバック
 // ============================================================
 function onFaceResults(results){
-  if(!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0){
-    applyMouth(0);
-    inPeak = false;
-    return;
+  if(!results.multiFaceLandmarks || !results.multiFaceLandmarks.length){
+    applyMouth(0); inPeak=false; return;
   }
-
   const lm = results.multiFaceLandmarks[0];
 
-  // ── 1. 口の「見た目」連動 ──────────────────────────────
-  // 上唇中央(13) と 下唇中央(14) の Y 距離を顔高さで正規化
-  const faceH   = Math.abs(lm[152].y - lm[10].y) || 0.001;
-  const lipGap  = Math.max(0, lm[14].y - lm[13].y);
-  const lipNorm = lipGap / faceH;
-
-  // 0.02=閉じ / 0.18=全開 でクランプ → ratio 0〜1
-  const lipRatio = Math.min(1, Math.max(0, (lipNorm - 0.02) / 0.16));
+  // 1. 口の見た目連動
+  const faceH  = Math.abs(lm[152].y - lm[10].y) || 0.001;
+  const lipGap = Math.max(0, lm[14].y - lm[13].y);
+  const lipRatio = Math.min(1, Math.max(0, (lipGap/faceH - 0.02) / 0.16));
   applyMouth(lipRatio);
 
-  // ── 2. 咀嚼カウント（顎の上下ピーク検出）───────────────
-  // 顎先(152) と 鼻下(164) の Y 距離で顎の動きを計測
+  // 2. 咀嚼カウント（顎ピーク検出）
   const jawDist = Math.abs(lm[152].y - lm[164].y) / faceH;
 
-  // ベースライン確立（最初の20フレームで平均を取る）
   if(jawBaseline === null){
     jawSamples.push(jawDist);
     if(jawSamples.length >= 20){
       jawBaseline = jawSamples.reduce((a,b)=>a+b,0) / jawSamples.length;
       jawSamples  = [];
-      $('calNotice').textContent = '検出OK！もぐもぐしてみてね 🟢';
+      $('calNotice').textContent = '検出OK！口を動かしてみてね 🟢';
       $('s2Start').disabled = false;
     } else {
-      $('calNotice').textContent = `キャリブレーション中... ${jawSamples.length}/20`;
+      $('calNotice').textContent = `キャリブレーション中… ${jawSamples.length}/20`;
     }
     return;
   }
 
-  // ベースラインからのズレ（顎が下がる＝＋方向）
   const delta = jawDist - jawBaseline;
-
-  // 閾値を超えたら「山の中」、下がったら1カウント
-  const RISE  = 0.010;   // 山の立ち上がり閾値
-  const FALL  = 0.003;   // 山の立ち下がり閾値
-
-  if(!inPeak && delta > RISE){
+  if(!inPeak && delta > 0.010){
     inPeak = true;
-  } else if(inPeak && delta < FALL){
+  } else if(inPeak && delta < 0.003){
     inPeak = false;
-    // ★ 咀嚼 1 回カウント
+    // もぐもぐ1回カウント
     chewCount++;
-    updateChewUI(chewCount);
-    bounceChar();
-    if(chewCount % 10 === 0) randomSpeech();
-    // ゲーム中ならミッションチェック
-    if(timerInt) checkChewMissions();
+    updateChewUI();
+    // もぐもぐミッション
+    if(chewCount>=30)  completeMission('chew30');
+    if(chewCount>=50)  completeMission('chew50');
+    if(chewCount>=100) completeMission('chew100');
+    // キャラ反応（10回おき）
+    if(chewCount%10===0) setSpeech(SPEECH_CHEW[Math.floor(Math.random()*SPEECH_CHEW.length)]);
   }
-
-  // ベースラインをゆっくり追従（姿勢ドリフト補正）
-  jawBaseline = jawBaseline * 0.985 + jawDist * 0.015;
+  jawBaseline = jawBaseline*0.985 + jawDist*0.015;
 }
 
 // ============================================================
-//  キャラクターバウンス
+// カメラ起動
 // ============================================================
-function bounceChar(){
-  [$('charSvg2'), $('charSvg3')].forEach(el=>{
-    if(!el) return;
-    el.classList.remove('bounce');
-    void el.offsetWidth;
-    el.classList.add('bounce');
-    setTimeout(()=>el.classList.remove('bounce'), 400);
-  });
+async function startCamera(){
+  $('sdot').className='sdot cal';
+  $('stext').textContent='カメラを起動しています...';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(
+      { video:{facingMode:'user',width:320,height:240}, audio:false });
+    const video = $('video');
+    video.srcObject = stream;
+    await new Promise(r=>{ video.onloadedmetadata=r; });
+
+    const fm = new FaceMesh({ locateFile: f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}` });
+    fm.setOptions({ maxNumFaces:1, refineLandmarks:true, minDetectionConfidence:0.55, minTrackingConfidence:0.55 });
+    fm.onResults(onFaceResults);
+
+    mpCamera = new Camera(video, {
+      onFrame: async()=>{ await fm.send({image:video}); },
+      width:320, height:240
+    });
+    mpCamera.start();
+
+    $('sdot').className='sdot on';
+    $('stext').textContent='顔が映ったら口を動かしてみてね！';
+    mpReady=true;
+  } catch(e){
+    $('sdot').className='sdot';
+    $('stext').textContent='カメラの許可が必要です。ブラウザの設定を確認してください。';
+    $('calNotice').textContent='';
+  }
 }
 
-function randomSpeech(arr){
-  const pool = arr || SPEECH;
-  const msg = pool[Math.floor(Math.random() * pool.length)];
-  $('speech2').textContent = msg;
-  $('speech3').textContent = msg;
-}
-
 // ============================================================
-//  画面3: ゲーム開始
+// 画面3: ゲーム開始
 // ============================================================
 function goS3(){
-  // キャラを画面3にも反映
   applyCharStyle('c3');
-  chewCount = 0; updateChewUI(0);
-
-  // ミッション初期化
   cfg = JSON.parse(JSON.stringify(CFGS[ageKey]));
   totalSec = cfg.mins * 60;
   remaining = totalSec;
-  points = 0; stampArr = []; halfDone = false;
-  $('ptBadge').textContent = '⭐ 0 pt';
-  $('lvBadge').textContent = 'レベル 1';
+  points=0; stampArr=[]; chewCount=0; biteCount=0; cleared=false;
+
+  $('ptBadge').textContent  = '⭐ 0 pt';
+  $('lvBadge').textContent  = 'レベル 1';
+  $('goalBadge').textContent= `目標 ${goalBites}口`;
+  $('biteGoalDisp').textContent = goalBites;
+  $('biteCount').textContent    = '0';
+  $('biteProgFill').style.width = '0%';
   $('stampsEl').innerHTML = '';
-  $('resultEl').style.display = 'none';
+  $('clearBox').style.display='none';
+  $('biteBtn').disabled=false;
+  updateChewUI();
   renderMissions();
   updateTimer();
-
   showScreen(S3);
 
-  // タイマー開始
   timerInt = setInterval(()=>{
     remaining--;
     updateTimer();
-    if(!halfDone && remaining <= totalSec/2){
-      halfDone = true;
-      completeMission('half');
+    if(Math.random()<0.04) blink();
+    if(remaining<=0 && !cleared){
+      clearInterval(timerInt); timerInt=null;
+      // 時間切れでもクリアしてなければタイムアップ表示
+      timeUp();
     }
-    // 目パチ
-    if(Math.random() < 0.04) blink();
-    if(remaining <= 0){ clearInterval(timerInt); timerInt=null; finish(); }
-  }, 1000);
+  },1000);
 }
 
 // ============================================================
-//  タイマー表示
+// タイムアップ（クリアできなかった場合）
+// ============================================================
+function timeUp(){
+  $('biteBtn').disabled=true;
+  $('clearBox').style.display='block';
+  $('clearBox').style.borderColor='#EF9F27';
+  $('clearBox').style.background='#FAEEDA';
+  $('clearBox').querySelector('.emoji').textContent='⏰';
+  $('clearMsg').innerHTML =
+    `時間切れ！${biteCount}口たべたね！<br>次はクリアしよう！<br>⭐ ${points}pt`;
+  setSpeech('よくがんばったね！');
+}
+
+// ============================================================
+// タイマー
 // ============================================================
 function updateTimer(){
-  const m = String(Math.floor(remaining/60)).padStart(2,'0');
-  const s = String(remaining%60).padStart(2,'0');
-  $('timerEl').textContent = m+':'+s;
-  $('progFill').style.width = Math.round(totalSec>0?(remaining/totalSec)*100:0) + '%';
+  const m=String(Math.floor(remaining/60)).padStart(2,'0');
+  const s=String(remaining%60).padStart(2,'0');
+  $('timerEl').textContent=m+':'+s;
 }
 
 // ============================================================
-//  ミッション
+// ミッション
 // ============================================================
 function renderMissions(){
-  $('missionEl').innerHTML = '';
+  $('missionEl').innerHTML='';
   cfg.missions.forEach(m=>{
-    const d = document.createElement('div');
-    d.className = 'mission' + (m.done?' done':'');
-    d.id = 'ms-'+m.id;
-    d.innerHTML = `<div class="mi">${m.done?'✅':m.icon}</div>`+
-                  `<div class="mt">${m.text}</div>`+
-                  `<div class="mp">${m.done?'クリア！':'+'+m.pts+'pt'}</div>`;
+    const d=document.createElement('div');
+    d.className='mission'+(m.done?' done':'');
+    d.id='ms-'+m.id;
+    d.innerHTML=`<div class="mi">${m.done?'✅':m.icon}</div>`+
+                `<div class="mt">${m.text}</div>`+
+                `<div class="mp">${m.done?'クリア！':'+'+m.pts+'pt'}</div>`;
     $('missionEl').appendChild(d);
   });
 }
-
 function completeMission(id){
-  const m = cfg.missions.find(x=>x.id===id);
-  if(!m || m.done) return;
-  m.done = true;
-  addPoints(m.pts);
-  addStamp();
-  randomSpeech();
-  bounceChar();
-  renderMissions();
+  const m=cfg?.missions.find(x=>x.id===id);
+  if(!m||m.done) return;
+  m.done=true; addPoints(m.pts); addStamp(); renderMissions();
 }
-
-function checkChewMissions(){
-  const map = {c20:20, c30:30, c50:50, c60:60, c100:100};
-  Object.entries(map).forEach(([id,n])=>{ if(chewCount>=n) completeMission(id); });
-}
-
 function addPoints(p){
-  points += p;
-  $('ptBadge').textContent = '⭐ '+points+' pt';
-  $('lvBadge').textContent = 'レベル '+(points<30?1:points<70?2:points<120?3:4);
+  points+=p;
+  $('ptBadge').textContent='⭐ '+points+' pt';
+  $('lvBadge').textContent='レベル '+(points<30?1:points<70?2:points<120?3:4);
 }
-
 function addStamp(){
-  const s = document.createElement('div');
-  s.className = 'stamp';
-  s.textContent = STAMPS[stampArr.length % STAMPS.length];
-  $('stampsEl').appendChild(s);
-  stampArr.push(s);
+  const s=document.createElement('div');
+  s.className='stamp'; s.textContent=STAMPS[stampArr.length%STAMPS.length];
+  $('stampsEl').appendChild(s); stampArr.push(s);
 }
 
 // ============================================================
-//  目パチ
+// キャラ演出
 // ============================================================
-function blink(){
-  [['c2eL','c2eR'],['c3eL','c3eR']].forEach(([l,r])=>{
-    const eL=$(l), eR=$(r);
-    if(!eL||!eR) return;
-    eL.setAttribute('ry','1'); eR.setAttribute('ry','1');
-    setTimeout(()=>{ eL.setAttribute('ry','6'); eR.setAttribute('ry','6'); }, 140);
+function bounceChar(){
+  [$('charSvg2'),$('charSvg3')].forEach(el=>{
+    if(!el) return;
+    el.classList.remove('bounce'); void el.offsetWidth; el.classList.add('bounce');
+    setTimeout(()=>el.classList.remove('bounce'),400);
   });
 }
-
-// ============================================================
-//  ゲーム終了
-// ============================================================
-function finish(){
-  completeMission('fin');
-  const lv = points<30?1:points<70?2:points<120?3:4;
-  $('resultEl').style.display = 'block';
-  $('resultEl').innerHTML =
-    `🎉 ごはんかんりょう！<br>⭐ ${points}pt　レベル${lv}　もぐもぐ${chewCount}回　スタンプ×${stampArr.length}`;
-  $('speech3').textContent = 'やったー！すごい！';
-  bounceChar();
+function setSpeech(msg){
+  $('speech2').textContent=msg;
+  $('speech3').textContent=msg;
+}
+function blink(){
+  [['c2eL','c2eR'],['c3eL','c3eR']].forEach(([l,r])=>{
+    const eL=$(l),eR=$(r); if(!eL||!eR) return;
+    eL.setAttribute('ry','1'); eR.setAttribute('ry','1');
+    setTimeout(()=>{ eL.setAttribute('ry','6'); eR.setAttribute('ry','6'); },140);
+  });
 }
 </script>
 </body>
