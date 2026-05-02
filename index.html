@@ -522,15 +522,13 @@ function startDetection(video){
     // 感度を加味した閾値
     const threshold = Math.max(0.3, baselineDiff * (12 - sensitivity));
 
-    // キャラの口をリアルタイムで動かす
-    const mouthRatio=Math.min(1, smoothed/threshold*0.8);
-    applyMouth(mouthRatio);
-
     // ピーク検出でもぐもぐカウント
     if(!inPeak && smoothed>threshold){
       inPeak=true;
+      applyMouth(0.85); // 口を開く
     } else if(inPeak && smoothed<threshold*0.4){
       inPeak=false;
+      applyMouth(0);    // 口を閉じる
       chewCount++;
       updateChewUI();
       if(chewCount>=30)  completeMission('chew30');
