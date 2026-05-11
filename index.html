@@ -138,7 +138,7 @@ body{font-family:'Hiragino Maru Gothic ProN','BIZ UDPGothic',sans-serif;backgrou
     <span id="sVal">6</span>
   </div>
   <div class="meter-bar"><div class="meter-fill" id="meterFill"></div></div>
-  <div class="hint">カメラが起動しない場合はブラウザのアドレスバーからカメラを許可してください</div>
+  <div class="hint">カメラ起動後、3秒間静止してキャリブレーションしてください<br>その後もぐもぐすると連動します</div>
   <div class="btn-row">
     <button class="btn-s" onclick="startGame()">🍴 スタート！</button>
     <button class="btn-b" onclick="toS1()">← もどる</button>
@@ -195,7 +195,9 @@ let chr=null,tMin=10,tBite=20,sens=6;
 let bites=0,muguAll=0,muguSes=0;
 let tSec=0,tTimer=null,isOpen=false;
 let camStream=null,detTimer=null,canvas=null,ctx=null,cur='s1';
-let prevPx=null,motHist=[],cool=0;
+// 顎検知用
+let baseline=null,calibFrames=[],calibDone=false;
+let jawHist=[],jawState='up',jawCool=0;
 
 function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');cur=id}
 function selChar(c){chr=c;$('boyCard').classList.toggle('selected',c==='boy');$('girlCard').classList.toggle('selected',c==='girl');$('btnNext').disabled=false}
@@ -230,32 +232,74 @@ async function startCam(){
   }
 }
 function camErr(m){$('camDot').className='dot err';$('camMsg').textContent=m}
-function startDet(){stopDet();prevPx=null;motHist=[];cool=0;detTimer=setInterval(detect,80)}
+function startDet(){
+  stopDet();
+  baseline=null;calibFrames=[];calibDone=false;
+  jawHist=[];jawState='up';jawCool=0;isOpen=false;
+  if(cur==='s2')$('camMsg').textContent='キャリブレーション中…（3秒間静止してください）';
+  detTimer=setInterval(detect,80);
+}
 function stopDet(){if(detTimer){clearInterval(detTimer);detTimer=null}}
+
+// 顔下半分の「暗い領域の重心Y」で顎位置を推定
+function jawY(v){
+  canvas.width=v.videoWidth;canvas.height=v.videoHeight;ctx.drawImage(v,0,0);
+  const w=canvas.width,h=canvas.height;
+  // 顔の下半分・中央エリアを解析
+  const rx=w*.25|0, ry=h*.45|0, rw=w*.5|0, rh=h*.4|0;
+  const px=ctx.getImageData(rx,ry,rw,rh).data;
+  let sumY=0,cnt=0;
+  // 暗い画素（口・影）のY重心を求める
+  const darkTh=100;
+  for(let i=0;i<px.length;i+=4){
+    const lum=(px[i]*.299+px[i+1]*.587+px[i+2]*.114);
+    if(lum<darkTh){
+      const row=((i/4)/rw)|0;
+      sumY+=row; cnt++;
+    }
+  }
+  return cnt>20 ? sumY/cnt : null; // 暗画素が少なすぎる場合はnull
+}
 
 function detect(){
   const v=$('camVideo');
   if(!v||!v.videoWidth||v.paused||!camStream)return;
   try{
-    canvas.width=v.videoWidth;canvas.height=v.videoHeight;ctx.drawImage(v,0,0);
-    const w=canvas.width,h=canvas.height;
-    const px=ctx.getImageData(w*.3|0,h*.52|0,w*.4|0,h*.22|0).data;
-    let br=0,mo=0,n=px.length/4;
-    for(let i=0;i<px.length;i+=4){
-      br+=px[i]*.299+px[i+1]*.587+px[i+2]*.114;
-      if(prevPx)mo+=Math.abs(px[i]-prevPx[i])+Math.abs(px[i+1]-prevPx[i+1])+Math.abs(px[i+2]-prevPx[i+2]);
+    const y=jawY(v);
+    if(y===null)return;
+
+    // キャリブレーション：最初の約3秒（40フレーム）でベースライン計測
+    if(!calibDone){
+      calibFrames.push(y);
+      const prog=Math.min(100,calibFrames.length/40*100|0);
+      if(cur==='s2')$('meterFill').style.width=prog+'%';
+      if(calibFrames.length>=40){
+        baseline=calibFrames.reduce((a,b)=>a+b)/calibFrames.length;
+        calibDone=true;
+        if(cur==='s2')$('camMsg').textContent='カメラ接続中（キャリブ完了）';
+      }
+      return;
     }
-    br/=n; mo/=n;
-    prevPx=new Uint8ClampedArray(px);
-    motHist.push(mo);if(motHist.length>5)motHist.shift();
-    const avgMo=motHist.reduce((a,b)=>a+b,0)/motHist.length;
-    if(cur==='s2')$('meterFill').style.width=Math.min(100,avgMo*3)+'%';
-    if(cool>0){cool--;return}
-    const open=(avgMo>14-sens)||(br<140-sens*4);
-    if(open!==isOpen){
-      isOpen=open;
-      if(open){muguSes++;muguAll++;cool=3}
-      if(cur==='s2'){$('previewImg').src=ip(IM[chr][isOpen?'m1':'n1']);$('prevCnt').textContent=muguSes}
+
+    // ベースラインからのズレ（下方向が正）
+    const diff=y-baseline;
+    // 感度に応じた閾値（sensが高いほど小さな動きで反応）
+    const th=8+(10-sens)*2; // sens=1:26px, sens=10:8px
+
+    // メーター表示
+    if(cur==='s2')$('meterFill').style.width=Math.min(100,Math.abs(diff)/th*50+50|0)+'%';
+
+    if(jawCool>0){jawCool--;return}
+
+    // ピーク検出：「up→down（顎が下がる）→up（戻る）」で1もぐもぐ
+    if(jawState==='up' && diff>th){
+      jawState='down'; isOpen=true;
+      if(cur==='s2'){$('previewImg').src=ip(IM[chr].m1);$('prevCnt').textContent=muguSes}
+      else if(cur==='s3'){updChar()}
+    } else if(jawState==='down' && diff<th*0.4){
+      jawState='up'; isOpen=false; jawCool=4;
+      muguSes++; muguAll++;
+      if(cur==='s2'){$('previewImg').src=ip(IM[chr].n1);$('prevCnt').textContent=muguSes}
       else if(cur==='s3'){updChar();updMugu()}
     }
   }catch(e){}
@@ -263,6 +307,8 @@ function detect(){
 
 function startGame(){
   bites=0;muguAll=0;muguSes=0;isOpen=false;tSec=tMin*60;
+  // キャリブ済みならそのまま引き継ぎ、未完なら再スタート
+  if(!calibDone){startDet()}
   $('glBadge').textContent='目標 '+tBite+'口';$('biteTot').textContent='/ '+tBite;
   $('lvBadge').textContent='レベル 1';$('ptBadge').textContent='⭐ 0 pt';
   $('biteCnt').textContent='0';$('progBar').style.width='0%';
@@ -306,6 +352,7 @@ function showGoal(){
 function restart(){
   clearInterval(tTimer);stopDet();
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  baseline=null;calibFrames=[];calibDone=false;jawHist=[];jawState='up';
   chr=null;isOpen=false;
   $('boyCard').classList.remove('selected');$('girlCard').classList.remove('selected');
   $('btnNext').disabled=true;
